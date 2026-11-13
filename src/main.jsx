@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home/index.jsx'
 import Login from './pages/Login/index.jsx'
 
+import "@fontsource-variable/inter";
 import GlobalStyles from './styles/globalStyles.js'
 import Header from './components/Header/index.jsx'
 

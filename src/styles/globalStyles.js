@@ -13,11 +13,11 @@ export default createGlobalStyle`
   * { margin: 0; padding: 0; box-sizing: border-box; }
   [hidden] { display: none !important; }
 
-  body {
-    background: #000;
-    color: var(--txt);
-    font: 16px Montserrat, "Segoe UI", system-ui, sans-serif;
-  }
+   body {
+     background: #000;
+     color: var(--txt);
+     font: 16px "Inter Variable", system-ui, sans-serif;
+   }
 
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
   a { color: inherit; text-decoration: none; }
