@@ -4,6 +4,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import Home from './pages/Home/index.jsx'
 import Login from './pages/Login/index.jsx'
+import Perfil from './pages/Perfil/index.jsx'
+import Configuracoes from './pages/Configuracoes/index.jsx'
+
+
 
 import "@fontsource-variable/inter";
 import GlobalStyles from './styles/globalStyles.js'
@@ -22,7 +26,10 @@ createRoot(document.getElementById('root')).render(
           </>
         } />
 
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login />} /> 
+        <Route path="/home" element={<Home />} />
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/configuracoes" element={<Configuracoes />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
