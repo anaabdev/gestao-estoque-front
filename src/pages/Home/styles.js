@@ -45,10 +45,10 @@ export const Side = styled.aside`
   }
 `;
 
-export const Logo = styled.span`
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--txt);
+export const Logo = styled.img`
+  width: 32px;
+  height: 34px;
+  object-fit: contain;
   @media (max-width: 700px) { display: none; }
 `;
 

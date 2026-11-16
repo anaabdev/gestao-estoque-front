@@ -6,6 +6,7 @@ import settings from "../../assets/Settings_Home.svg";
 import saida from "../../assets/Saida_Home.svg";
 import perfilTop from "../../assets/PerfilTop_Home.svg";
 import mascote from "../../assets/Mascote_Home.svg";
+import logo from "../../assets/Logo_Site.svg";
 import { useAppSettings } from "../../context/useAppSettings.js";
 import * as S from "./styles";
 
@@ -122,7 +123,7 @@ function Home() {
   return (
     <S.Shell>
       <S.Side>
-        <S.Logo>F</S.Logo>
+        <S.Logo src={logo} alt={t("brand.logo")} />
         <S.Nav aria-label={t("nav.mainNavigation")}>
           <S.Item to="/home" end aria-label={t("nav.home")}><S.Icone src={casinha} alt="" /></S.Item>
           <S.Item to="/perfil" aria-label={t("nav.profile")}><S.Icone src={perfilSide} alt="" /></S.Item>

@@ -5,6 +5,7 @@ const SETTINGS_KEY = "gestao-estoque-preferencias";
 
 const messages = {
   en: {
+    "brand.logo": "Site logo",
     "nav.home": "Home",
     "nav.profile": "Profile",
     "nav.settings": "Settings",
@@ -97,6 +98,7 @@ const messages = {
     "login.footer": "All rights reserved 2026",
   },
   pt: {
+    "brand.logo": "Logo do site",
     "nav.home": "Início",
     "nav.profile": "Perfil",
     "nav.settings": "Configurações",

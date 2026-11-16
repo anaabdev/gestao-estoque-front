@@ -20,10 +20,10 @@ export const Card = styled.form`
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 `;
 
-export const Logo = styled.span`
-  font-size: 36px;
-  font-weight: 700;
-  line-height: 1;
+export const Logo = styled.img`
+  width: 42px;
+  height: 44px;
+  object-fit: contain;
 `;
 
 export const Titulo = styled.h1`

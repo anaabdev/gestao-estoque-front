@@ -1,5 +1,7 @@
 import * as S from "./styles";
 import { useAppSettings } from "../../context/useAppSettings.js";
+import Logo from "../../assets/Logo_Site.svg";
+
 
 function Login() {
   const { t } = useAppSettings();
@@ -7,7 +9,7 @@ function Login() {
     <S.Pagina>
       {/* JS: trocar o onSubmit pela função de login (api.login) */}
       <S.Card onSubmit={(e) => e.preventDefault()}>
-        <S.Logo>F</S.Logo> {/* troque pelo SVG do logo quando tiver */}
+        <S.Logo src={Logo} alt={t("brand.logo")} />
         <S.Titulo>{t("login.title")}</S.Titulo>
 
         {/* JS: mostrar a mensagem de erro que vier da API (tirar o hidden) */}

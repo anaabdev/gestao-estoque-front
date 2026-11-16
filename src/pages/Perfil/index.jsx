@@ -5,6 +5,7 @@ import perfilSide from "../../assets/PerfilSideBar_Home.svg";
 import settings from "../../assets/Settings_Home.svg";
 import saida from "../../assets/Saida_Home.svg";
 import perfilTop from "../../assets/PerfilTop_Home.svg";
+import logo from "../../assets/Logo_Site.svg";
 import { useAppSettings } from "../../context/useAppSettings.js";
 import * as H from "../Home/styles";
 import * as S from "./styles";
@@ -51,7 +52,7 @@ function Perfil() {
   return (
     <H.Shell>
       <H.Side>
-        <H.Logo>F</H.Logo>
+        <H.Logo src={logo} alt={t("brand.logo")} />
         <H.Nav aria-label={t("nav.mainNavigation")}>
           <H.Item to="/home" end aria-label={t("nav.home")}><H.Icone src={casinha} alt="" /></H.Item>
           <H.Item to="/perfil" aria-label={t("nav.profile")}><H.Icone src={perfilSide} alt="" /></H.Item>

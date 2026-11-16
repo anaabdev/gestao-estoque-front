@@ -97,4 +97,6 @@ export default createGlobalStyle`
 
   html[data-theme="light"] aside img,
   html[data-theme="light"] header img { filter: invert(1); }
+
+  html[data-theme="light"] img[src*="Logo_Site"] { filter: invert(1); }
 `;
