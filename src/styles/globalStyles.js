@@ -25,6 +25,9 @@ export default createGlobalStyle`
     --row-hover: #111;
     --accent-text: #c36a6a;
     --accent-surface: #321515;
+    --theme-choice-accent: #73b98a;
+    --theme-choice-surface: #173321;
+    --theme-choice-check: #34794f;
     --action-bg: #f0f0f0;
     --action-text: #111;
     --login-button-hover: #4f1414;
@@ -61,16 +64,19 @@ export default createGlobalStyle`
     --row-hover: #f4eeee;
     --accent-text: #9b3434;
     --accent-surface: #f8eaea;
+    --theme-choice-accent: #337d4d;
+    --theme-choice-surface: #e7f4ea;
+    --theme-choice-check: #337d4d;
     --action-bg: #292a2d;
     --action-text: #fff;
     --login-button-hover: #692222;
     --input-border: #c9cbd1;
     --input-placeholder: #777b83;
-    --panel-gradient: linear-gradient(155deg, #f6e6e6 0%, #f6f2f2 25%, var(--painel) 48%);
-    --welcome-gradient: radial-gradient(ellipse at 92% 105%, #e9caca 0%, transparent 44%), linear-gradient(120deg, #fff, #f7f7f8);
+    --panel-gradient: linear-gradient(155deg, #b3dfc0 0%, #e0efe4 29%, var(--painel) 53%);
+    --welcome-gradient: radial-gradient(ellipse at 92% 105%, #91cda2 0%, transparent 46%), linear-gradient(120deg, #fff, #f7f7f8);
     --section-gradient: linear-gradient(145deg, #fff, #f7f7f8 72%);
     --login-page: radial-gradient(ellipse at center, #fff 0%, #f3f3f5 70%);
-    --login-card: radial-gradient(circle at 25% 12%, #f4e3e3 0, transparent 55%), radial-gradient(circle at 80% 92%, #f2e3e3 0, transparent 50%), #fff;
+    --login-card: radial-gradient(circle at 25% 12%, #bde4c8 0, transparent 55%), radial-gradient(circle at 80% 92%, #a4d9b2 0, transparent 50%), #fff;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }

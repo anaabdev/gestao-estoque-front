@@ -58,12 +58,12 @@ export const ThemeChoices = styled.div`
 export const ThemeOption = styled.button`
   min-width: 0;
   padding: 8px;
-  border: 1px solid ${({ $active }) => ($active ? "var(--accent-text)" : "var(--border-subtle)")};
+  border: 1px solid ${({ $active }) => ($active ? "var(--theme-choice-accent)" : "var(--border-subtle)")};
   border-radius: 14px;
-  background: ${({ $active }) => ($active ? "var(--accent-surface)" : "var(--surface-raised)")};
+  background: ${({ $active }) => ($active ? "var(--theme-choice-surface)" : "var(--surface-raised)")};
   text-align: left;
   transition: border-color .15s ease, transform .15s ease, background .15s ease;
-  &:hover { border-color: var(--accent-text); transform: translateY(-1px); }
+  &:hover { border-color: var(--theme-choice-accent); transform: translateY(-1px); }
 `;
 
 export const ThemePreview = styled.div`
@@ -77,7 +77,7 @@ export const ThemePreview = styled.div`
   border-radius: 9px;
   background: ${({ $theme }) => ($theme === "dark" ? "#171717" : "#f6f6f7")};
   span { height: 8px; border-radius: 4px; background: ${({ $theme }) => ($theme === "dark" ? "#303030" : "#dedfe3")}; }
-  span:first-child { width: 48%; height: 17px; background: ${({ $theme }) => ($theme === "dark" ? "#552020" : "#efdede")}; }
+  span:first-child { width: 48%; height: 17px; background: ${({ $theme }) => ($theme === "dark" ? "#552020" : "#a8d8b6")}; }
   span:nth-child(2) { width: 85%; }
   span:nth-child(3) { width: 65%; }
 `;
@@ -145,7 +145,7 @@ export const SelectedMark = styled.span`
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--accent-text);
+  background: ${({ $theme }) => ($theme ? "var(--theme-choice-check)" : "var(--accent-text)")};
   color: #fff;
   font-size: 11px;
   font-weight: 700;

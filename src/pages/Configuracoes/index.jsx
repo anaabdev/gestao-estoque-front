@@ -63,7 +63,7 @@ function Configuracoes() {
                 <S.ThemePreview $theme="dark" aria-hidden="true"><span /><span /><span /></S.ThemePreview>
                 <S.OptionTitle>
                   <span>{t("settings.dark")}</span>
-                  {theme === "dark" && <S.SelectedMark aria-hidden="true">✓</S.SelectedMark>}
+                  {theme === "dark" && <S.SelectedMark $theme aria-hidden="true">✓</S.SelectedMark>}
                 </S.OptionTitle>
                 <S.OptionDescription>{t("settings.darkDescription")}</S.OptionDescription>
               </S.ThemeOption>
@@ -71,7 +71,7 @@ function Configuracoes() {
                 <S.ThemePreview $theme="light" aria-hidden="true"><span /><span /><span /></S.ThemePreview>
                 <S.OptionTitle>
                   <span>{t("settings.light")}</span>
-                  {theme === "light" && <S.SelectedMark aria-hidden="true">✓</S.SelectedMark>}
+                  {theme === "light" && <S.SelectedMark $theme aria-hidden="true">✓</S.SelectedMark>}
                 </S.OptionTitle>
                 <S.OptionDescription>{t("settings.lightDescription")}</S.OptionDescription>
               </S.ThemeOption>
