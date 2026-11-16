@@ -12,25 +12,28 @@ import Configuracoes from './pages/Configuracoes/index.jsx'
 import "@fontsource-variable/inter";
 import GlobalStyles from './styles/globalStyles.js'
 import Header from './components/Header/index.jsx'
+import { AppSettingsProvider } from './context/AppSettingsContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <GlobalStyles />
+    <AppSettingsProvider>
+      <BrowserRouter>
+        <GlobalStyles />
 
-      <Routes>
-        <Route path="/" element={
-          <>
-            <Header />
-            <Login />
-          </>
-        } />
+        <Routes>
+          <Route path="/" element={
+            <>
+              <Header />
+              <Login />
+            </>
+          } />
 
-        <Route path="/login" element={<Login />} /> 
-        <Route path="/home" element={<Home />} />
-        <Route path="/perfil" element={<Perfil />} />
-        <Route path="/configuracoes" element={<Configuracoes />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="/login" element={<Login />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/configuracoes" element={<Configuracoes />} />
+        </Routes>
+      </BrowserRouter>
+    </AppSettingsProvider>
   </StrictMode>,
 )

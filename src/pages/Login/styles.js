@@ -6,7 +6,7 @@ export const Pagina = styled.div`
   display: grid;
   place-items: center;
   padding: 16px 16px 60px;
-  background: radial-gradient(ellipse at center, #1b1b1b 0%, #0a0a0a 45%, #000 75%);
+  background: var(--login-page);
 `;
 
 export const Card = styled.form`
@@ -16,10 +16,7 @@ export const Card = styled.form`
   align-items: center;
   padding: 44px 40px 40px;
   border-radius: 44px;
-  background:
-    radial-gradient(circle at 25% 12%, #3d1010 0, transparent 55%),
-    radial-gradient(circle at 80% 92%, #3d1010 0, transparent 50%),
-    #0b0b0b;
+  background: var(--login-card);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 `;
 
@@ -41,7 +38,7 @@ export const Erro = styled.p`
   margin: -16px 0 16px;
   font-size: 13px;
   text-align: center;
-  color: #ff6b6b;
+  color: var(--accent-text);
 `;
 
 export const Campo = styled.div`
@@ -75,7 +72,7 @@ export const Input = styled.input`
   font-size: 16px;
 
   &::placeholder { color: #8f8f8f; }
-  &:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  &:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
 `;
 
 export const Olho = styled.button`
@@ -105,12 +102,12 @@ export const Botao = styled.button`
   width: 100%;
   height: 40px;
   border-radius: 10px;
-  background: #3d1010;
+  background: var(--vinho);
   font-weight: 600;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   transition: background 0.15s;
 
-  &:hover { background: #4f1414; }
+  &:hover { background: var(--login-button-hover); }
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 `;
 
@@ -131,8 +128,8 @@ export const Footer = styled.footer`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--border-subtle);
   backdrop-filter: blur(6px);
 
-  p { font-size: 13px; color: rgba(240, 240, 240, 0.6); }
+  p { font-size: 13px; color: var(--mut); }
 `;

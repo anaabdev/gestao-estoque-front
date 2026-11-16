@@ -17,9 +17,9 @@ export const Sections = styled.div`
 export const SectionCard = styled.section`
   min-width: 0;
   padding: 25px;
-  border: 1px solid #ffffff0c;
+  border: 1px solid var(--border-subtle);
   border-radius: 22px;
-  background: linear-gradient(145deg, #0a0a0a, #080808 72%);
+  background: var(--section-gradient);
   box-shadow: 0 12px 34px #0002;
   @media (max-width: 600px) { padding: 20px 16px; border-radius: 18px; }
 `;
@@ -29,7 +29,7 @@ export const SectionHeading = styled.header`
   align-items: center;
   gap: 13px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #ffffff0d;
+  border-bottom: 1px solid var(--border-subtle);
   h2 { margin-bottom: 5px; font-size: 16px; font-weight: 650; }
   p { color: var(--mut); font-size: 11px; line-height: 1.45; }
 `;
@@ -40,10 +40,10 @@ export const SectionIcon = styled.span`
   flex: none;
   display: grid;
   place-items: center;
-  border: 1px solid ${({ $accent }) => ($accent ? "#793232" : "#ffffff12")};
+  border: 1px solid ${({ $accent }) => ($accent ? "var(--accent-text)" : "var(--border-subtle)")};
   border-radius: 13px;
-  background: ${({ $accent }) => ($accent ? "#3d1414" : "#191919")};
-  color: ${({ $accent }) => ($accent ? "#e6a3a3" : "#dedede")};
+  background: ${({ $accent }) => ($accent ? "var(--accent-surface)" : "var(--surface-raised)")};
+  color: ${({ $accent }) => ($accent ? "var(--accent-text)" : "var(--text-soft)")};
   svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 `;
 
@@ -58,23 +58,22 @@ export const Field = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  label { color: #dedede; font-size: 11px; font-weight: 550; }
+  label { color: var(--text-soft); font-size: 11px; font-weight: 550; }
   input {
     width: 100%;
     min-height: 42px;
     padding: 0 12px;
-    border: 1px solid #3b3b3b;
+    border: 1px solid var(--input-border);
     border-radius: 10px;
     outline: none;
-    background: #141414;
+    background: var(--surface-field);
     color: var(--txt);
     font: inherit;
     font-size: 12px;
     transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
-    &::placeholder { color: #707070; }
-    &:hover { border-color: #555; }
-    &:focus { border-color: #a95555; background: #191515; box-shadow: 0 0 0 3px #a955551c; }
-    &[type="date"] { color-scheme: dark; }
+    &::placeholder { color: var(--input-placeholder); }
+    &:hover { border-color: var(--border-strong); }
+    &:focus { border-color: var(--accent-text); background: var(--surface-raised); box-shadow: 0 0 0 3px var(--accent-surface); }
   }
 `;
 
@@ -90,7 +89,7 @@ export const FormFooter = styled.div`
 
 export const Status = styled.p`
   min-height: 16px;
-  color: ${({ $warning }) => ($warning ? "#e1a1a1" : "#a9cdb9")};
+  color: ${({ $warning }) => ($warning ? "var(--accent-text)" : "var(--success-text)")};
   font-size: 10px;
   line-height: 1.45;
 `;
@@ -99,12 +98,12 @@ export const PrimaryButton = styled.button`
   min-height: 40px;
   flex: none;
   padding: 0 16px;
-  border: 1px solid #ffffff1c;
+  border: 1px solid var(--border-subtle);
   border-radius: 11px;
-  background: #f0f0f0;
-  color: #111;
+  background: var(--action-bg);
+  color: var(--action-text);
   font-size: 11px;
   font-weight: 650;
   transition: background .15s ease, transform .15s ease;
-  &:hover { background: #fff; transform: translateY(-1px); }
+  &:hover { background: var(--action-bg); transform: translateY(-1px); }
 `;

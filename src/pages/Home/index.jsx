@@ -6,6 +6,7 @@ import settings from "../../assets/Settings_Home.svg";
 import saida from "../../assets/Saida_Home.svg";
 import perfilTop from "../../assets/PerfilTop_Home.svg";
 import mascote from "../../assets/Mascote_Home.svg";
+import { useAppSettings } from "../../context/useAppSettings.js";
 import * as S from "./styles";
 
 const STORAGE_KEY = "gestao-estoque-produtos";
@@ -30,6 +31,7 @@ function loadProducts() {
 }
 
 function Home() {
+  const { t } = useAppSettings();
   const [products, setProducts] = useState(loadProducts);
   const [filter, setFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState([]);
@@ -81,15 +83,15 @@ function Home() {
     const onHand = Number(form.onHand);
 
     if (!name) {
-      setFormError("Enter a product name.");
+      setFormError(t("home.nameRequired"));
       return;
     }
     if (form.available === "" || form.onHand === "" || available < 0 || onHand < 0) {
-      setFormError("Enter valid stock quantities.");
+      setFormError(t("home.quantitiesRequired"));
       return;
     }
     if (available > onHand) {
-      setFormError("Available quantity cannot be greater than on hand.");
+      setFormError(t("home.availableCannotExceed"));
       return;
     }
 
@@ -121,69 +123,69 @@ function Home() {
     <S.Shell>
       <S.Side>
         <S.Logo>F</S.Logo>
-        <S.Nav aria-label="Main navigation">
-          <S.Item to="/home" end aria-label="Home"><S.Icone src={casinha} alt="" /></S.Item>
-          <S.Item to="/perfil" aria-label="Profile"><S.Icone src={perfilSide} alt="" /></S.Item>
-          <S.Item to="/configuracoes" aria-label="Settings"><S.Icone src={settings} alt="" /></S.Item>
+        <S.Nav aria-label={t("nav.mainNavigation")}>
+          <S.Item to="/home" end aria-label={t("nav.home")}><S.Icone src={casinha} alt="" /></S.Item>
+          <S.Item to="/perfil" aria-label={t("nav.profile")}><S.Icone src={perfilSide} alt="" /></S.Item>
+          <S.Item to="/configuracoes" aria-label={t("nav.settings")}><S.Icone src={settings} alt="" /></S.Item>
         </S.Nav>
-        <S.Sair as="a" href="/login" aria-label="Log out"><S.Icone src={saida} alt="" /></S.Sair>
+        <S.Sair as="a" href="/login" aria-label={t("nav.logout")}><S.Icone src={saida} alt="" /></S.Sair>
       </S.Side>
 
       <S.Painel>
         <S.Topo>
           <div>
-            <S.Eyebrow>STOCK MANAGEMENT</S.Eyebrow>
-            <h1>Inventory</h1>
+            <S.Eyebrow>{t("home.eyebrow")}</S.Eyebrow>
+            <h1>{t("home.title")}</h1>
           </div>
           <S.TopActions>
             <S.AddButton type="button" onClick={openModal}>
-              <span aria-hidden="true">+</span> Add a product
+              <span aria-hidden="true">+</span> {t("home.add")}
             </S.AddButton>
-            <S.Perfil to="/perfil" aria-label="Profile"><img src={perfilTop} alt="" /></S.Perfil>
+            <S.Perfil to="/perfil" aria-label={t("nav.profile")}><img src={perfilTop} alt="" /></S.Perfil>
           </S.TopActions>
         </S.Topo>
 
         <S.Destaques>
           <S.Welcome>
             <S.WelcomeCopy>
-              <S.Ola>Welcome to your inventory</S.Ola>
-              <S.Mut>Keep track of your products and stock levels.</S.Mut>
+              <S.Ola>{t("home.welcome")}</S.Ola>
+              <S.Mut>{t("home.welcomeText")}</S.Mut>
             </S.WelcomeCopy>
             <S.Mascote src={mascote} alt="" aria-hidden="true" />
           </S.Welcome>
           <S.Stat>
-            <span className="stat-label">Products in inventory</span>
+            <span className="stat-label">{t("home.productCount")}</span>
             <strong>{products.length}</strong>
           </S.Stat>
           <S.Stat $alert={lowStockCount > 0}>
-            <span className="stat-label">Low stock</span>
+            <span className="stat-label">{t("home.lowStock")}</span>
             <strong>{lowStockCount}</strong>
-            <span className="stat-note">less than {LOW_STOCK_LIMIT} available</span>
+            <span className="stat-note">{t("home.lessThan", { limit: LOW_STOCK_LIMIT })}</span>
           </S.Stat>
         </S.Destaques>
 
         <S.Box>
           <S.TableHeader>
             <div>
-              <h2>Products</h2>
-              <p>Manage the items you have in stock.</p>
+              <h2>{t("home.products")}</h2>
+              <p>{t("home.manageProducts")}</p>
             </div>
             {selectedIds.length > 0 && (
               <S.BulkActions>
-                <span>{selectedIds.length} selected</span>
+                <span>{selectedIds.length} {t("home.selected")}</span>
                 <S.DeleteButton type="button" onClick={() => removeProducts(selectedIds)}>
-                  Remove selected
+                  {t("home.removeSelected")}
                 </S.DeleteButton>
               </S.BulkActions>
             )}
           </S.TableHeader>
 
-          <S.Abas aria-label="Filter products">
+          <S.Abas aria-label={t("home.filterProducts")}>
             <S.Aba type="button" $ativa={filter === "all"} onClick={() => setFilter("all")}>
-              All products <span>{products.length}</span>
+              {t("home.allProducts")} <span>{products.length}</span>
             </S.Aba>
             <S.Aba type="button" $ativa={filter === "low"} onClick={() => setFilter("low")}>
-              Low stock <span>{lowStockCount}</span>
+              {t("home.lowStock")} <span>{lowStockCount}</span>
             </S.Aba>
           </S.Abas>
 
@@ -191,38 +193,45 @@ function Home() {
             <table>
               <thead>
                 <tr>
-                  <th><S.Checkbox aria-label="Select all visible products" checked={allVisibleSelected} onChange={toggleVisibleProducts} /></th>
-                  <th>Product</th>
-                  <th>Unavailable</th>
-                  <th>Available</th>
-                  <th>On hand</th>
-                  <th aria-label="Actions"></th>
+                  <th><S.Checkbox aria-label={t("home.selectAll")} checked={allVisibleSelected} onChange={toggleVisibleProducts} /></th>
+                  <th>{t("home.product")}</th>
+                  <th>{t("home.unavailable")}</th>
+                  <th>{t("home.available")}</th>
+                  <th>{t("home.onHand")}</th>
+                  <th aria-label={t("home.actions")}></th>
                 </tr>
               </thead>
               <tbody>
                 {visibleProducts.map((product) => {
                   const available = Number(product.available);
                   const onHand = Number(product.onHand);
+                  const productName = product.id === "sneaker"
+                    ? t("product.sneaker")
+                    : product.id === "camiseta"
+                      ? t("product.camiseta")
+                      : product.id === "bone"
+                        ? t("product.bone")
+                        : product.name;
                   return (
                     <S.Linha key={product.id} $marcada={selectedIds.includes(product.id)}>
                       <td>
                         <S.Checkbox
-                          aria-label={`Select ${product.name}`}
+                          aria-label={t("home.selectProduct", { name: productName })}
                           checked={selectedIds.includes(product.id)}
                           onChange={() => toggleProduct(product.id)}
                         />
                       </td>
                       <td>
                         <S.Produto>
-                          <S.Mini aria-hidden="true">{product.name.trim().charAt(0).toUpperCase()}</S.Mini>
-                          <span>{product.name}</span>
+                          <S.Mini aria-hidden="true">{productName.trim().charAt(0).toUpperCase()}</S.Mini>
+                          <span>{productName}</span>
                         </S.Produto>
                       </td>
                       <td>{Math.max(onHand - available, 0)}</td>
                       <td><S.StockValue $low={available < LOW_STOCK_LIMIT}>{available}</S.StockValue></td>
                       <td>{onHand}</td>
                       <td>
-                        <S.RowDelete type="button" onClick={() => removeProducts([product.id])} aria-label={`Remove ${product.name}`} title={`Remove ${product.name}`}>
+                        <S.RowDelete type="button" onClick={() => removeProducts([product.id])} aria-label={t("home.removeProduct", { name: productName })} title={t("home.removeProduct", { name: productName })}>
                           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
                         </S.RowDelete>
                       </td>
@@ -235,9 +244,9 @@ function Home() {
           {visibleProducts.length === 0 && (
             <S.Vazio>
               <span aria-hidden="true">□</span>
-              <strong>{filter === "low" ? "No products with low stock" : "Your inventory is empty"}</strong>
-              <p>{filter === "low" ? "Everything is sufficiently stocked." : "Add your first product to get started."}</p>
-              {filter === "all" && <S.AddButton type="button" onClick={openModal}>+ Add a product</S.AddButton>}
+              <strong>{filter === "low" ? t("home.noLowStock") : t("home.inventoryEmpty")}</strong>
+              <p>{filter === "low" ? t("home.everythingStocked") : t("home.addFirstProduct")}</p>
+              {filter === "all" && <S.AddButton type="button" onClick={openModal}>+ {t("home.add")}</S.AddButton>}
             </S.Vazio>
           )}
         </S.Box>
@@ -247,8 +256,8 @@ function Home() {
         <S.Overlay onMouseDown={(event) => event.target === event.currentTarget && closeModal()}>
           <S.Dialog role="dialog" aria-modal="true" aria-labelledby="add-product-title">
             <S.ModalTop>
-              <h2 id="add-product-title">Add a product</h2>
-              <S.CloseButton type="button" onClick={closeModal} aria-label="Close">×</S.CloseButton>
+              <h2 id="add-product-title">{t("home.modalTitle")}</h2>
+              <S.CloseButton type="button" onClick={closeModal} aria-label={t("common.close")}>×</S.CloseButton>
             </S.ModalTop>
             <S.ProductForm onSubmit={saveProduct}>
               <S.ProductPreview aria-hidden="true">
@@ -256,21 +265,21 @@ function Home() {
               </S.ProductPreview>
               <S.FormFields>
                 <S.Field>
-                  <label htmlFor="product-name">name:</label>
-                  <input id="product-name" autoFocus maxLength={80} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Product name" />
+                  <label htmlFor="product-name">{t("home.name")}</label>
+                  <input id="product-name" autoFocus maxLength={80} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder={t("home.namePlaceholder")} />
                 </S.Field>
                 <S.Field>
-                  <label htmlFor="product-available">available:</label>
+                  <label htmlFor="product-available">{t("home.available").toLowerCase()}:</label>
                   <input id="product-available" type="number" min="0" step="1" value={form.available} onChange={(event) => setForm({ ...form, available: event.target.value })} placeholder="0" />
                 </S.Field>
                 <S.Field>
-                  <label htmlFor="product-on-hand">on hand:</label>
+                  <label htmlFor="product-on-hand">{t("home.onHand").toLowerCase()}:</label>
                   <input id="product-on-hand" type="number" min="0" step="1" value={form.onHand} onChange={(event) => setForm({ ...form, onHand: event.target.value })} placeholder="0" />
                 </S.Field>
                 {formError && <S.FormError role="alert">{formError}</S.FormError>}
                 <S.FormFooter>
-                  <S.CancelButton type="button" onClick={closeModal}>Cancel</S.CancelButton>
-                  <S.SaveButton type="submit">Save product</S.SaveButton>
+                  <S.CancelButton type="button" onClick={closeModal}>{t("common.cancel")}</S.CancelButton>
+                  <S.SaveButton type="submit">{t("home.saveProduct")}</S.SaveButton>
                 </S.FormFooter>
               </S.FormFields>
             </S.ProductForm>
