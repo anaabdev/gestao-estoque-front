@@ -38,7 +38,7 @@ function Login() {
         {/* JS: desabilitar (disabled) enquanto a requisição estiver em andamento */}
         <S.Botao type="submit">{t("login.getStarted")}</S.Botao>
 
-        <S.Criar href="#">{t("login.createAccount")}</S.Criar>
+        
       </S.Card>
 
       <S.Footer>
