@@ -37,6 +37,7 @@ function Home() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -106,12 +107,15 @@ function Home() {
   const lowStockCount = products.filter(
     (product) => product.ativo && Number(product.quantidade) < LOW_STOCK_LIMIT,
   ).length;
-  const visibleProducts = useMemo(
-    () => filter === "low"
+  const visibleProducts = useMemo(() => {
+    let result = filter === "low"
       ? products.filter((product) => product.ativo && Number(product.quantidade) < LOW_STOCK_LIMIT)
-      : products,
-    [filter, products],
-  );
+      : products;
+    if (selectedCategoryId !== null) {
+      result = result.filter((product) => Number(product.categoria_id) === selectedCategoryId);
+    }
+    return result;
+  }, [filter, products, selectedCategoryId]);
   const allVisibleSelected = visibleProducts.length > 0
     && visibleProducts.every((product) => selectedIds.includes(product.id));
 
@@ -135,7 +139,7 @@ function Home() {
     setEditingProduct(product);
     setForm({
       nome: product.nome ?? "",
-      descricao: product.descricao ?? "",
+      descricao: (product.descricao ?? "").slice(0, DESCRIPTION_MAX_LENGTH),
       preco: String(product.preco ?? ""),
       quantidade: String(product.quantidade ?? 0),
       categoria_id: product.categoria_id == null ? "" : String(product.categoria_id),
@@ -153,6 +157,9 @@ function Home() {
     const quantidade = form.quantidade === "" ? NaN : Number(form.quantidade);
 
     if (!nome) errors.nome = t("home.nameRequired");
+    if (form.descricao.length > DESCRIPTION_MAX_LENGTH) {
+      errors.descricao = t("home.descriptionTooLong", { max: DESCRIPTION_MAX_LENGTH });
+    }
     if (form.preco === "" || !Number.isFinite(preco) || preco < 0) {
       errors.preco = t("home.priceInvalid");
     }
@@ -169,7 +176,7 @@ function Home() {
 
     const payload = {
       nome: form.nome.trim(),
-      descricao: form.descricao.trim() || null,
+      descricao: form.descricao.slice(0, DESCRIPTION_MAX_LENGTH).trim() || null,
       preco: Number(form.preco),
       quantidade: Number(form.quantidade),
       categoria_id: form.categoria_id === "" ? null : Number(form.categoria_id),
@@ -185,6 +192,7 @@ function Home() {
         ? current.map((product) => product.id === savedProduct.id ? savedProduct : product)
         : [...current, savedProduct]);
       setFilter("all");
+      setSelectedCategoryId(null);
       closeModal();
     } catch (requestError) {
       setFormError(requestError.message || t("home.productSaveFailed"));
@@ -232,6 +240,7 @@ function Home() {
     try {
       await api.excluirCategoria(id);
       setCategories((current) => current.filter((c) => c.id !== id));
+      if (selectedCategoryId === id) setSelectedCategoryId(null);
     } catch (requestError) {
       setCategoryError(requestError.message || t("home.categoryDeleteFailed"));
     }
@@ -329,9 +338,6 @@ function Home() {
             <h1>{t("home.title")}</h1>
           </div>
           <S.TopActions>
-            <S.CategoryButton type="button" onClick={() => { setCategoryError(""); setIsCategoryModalOpen(true); }}>
-              {t("home.manageCategories")}
-            </S.CategoryButton>
             <S.AddButton type="button" onClick={openCreateModal}>
               <span aria-hidden="true">+</span> {t("home.add")}
             </S.AddButton>
@@ -375,12 +381,37 @@ function Home() {
           </S.TableHeader>
 
           <S.Abas aria-label={t("home.filterProducts")}>
-            <S.Aba type="button" $ativa={filter === "all"} onClick={() => setFilter("all")}>
+            <S.Aba type="button" aria-pressed={filter === "all" && selectedCategoryId === null} $ativa={filter === "all" && selectedCategoryId === null} onClick={() => { setFilter("all"); setSelectedCategoryId(null); }}>
               {t("home.allProducts")} <span>{products.length}</span>
             </S.Aba>
-            <S.Aba type="button" $ativa={filter === "low"} onClick={() => setFilter("low")}>
+            <S.Aba type="button" aria-pressed={filter === "low"} $ativa={filter === "low"} onClick={() => { setFilter("low"); setSelectedCategoryId(null); }}>
               {t("home.lowStock")} <span>{lowStockCount}</span>
             </S.Aba>
+            <S.FilterSeparator aria-hidden="true">|</S.FilterSeparator>
+            {categories.map((category) => (
+              <S.CategoryFilterButton
+                key={category.id}
+                type="button"
+                aria-pressed={selectedCategoryId === category.id}
+                $ativa={selectedCategoryId === category.id}
+                onClick={() => { setFilter("all"); setSelectedCategoryId(category.id); }}
+              >
+                {category.nome}
+              </S.CategoryFilterButton>
+            ))}
+            <S.AddCategoryFilterButton
+              type="button"
+              aria-label={t("home.addCategory")}
+              title={t("home.addCategory")}
+              onClick={() => {
+                setCategoryName("");
+                setEditingCategoryId(null);
+                setCategoryError("");
+                setIsCategoryModalOpen(true);
+              }}
+            >
+              +
+            </S.AddCategoryFilterButton>
           </S.Abas>
 
           {error && <S.Alert role="alert">{error}</S.Alert>}
@@ -460,9 +491,9 @@ function Home() {
               {visibleProducts.length === 0 && (
                 <S.Vazio>
                   <span aria-hidden="true">□</span>
-                  <strong>{filter === "low" ? t("home.noLowStock") : t("home.inventoryEmpty")}</strong>
-                  <p>{filter === "low" ? t("home.everythingStocked") : t("home.addFirstProduct")}</p>
-                  {filter === "all" && <S.AddButton type="button" onClick={openCreateModal}>+ {t("home.add")}</S.AddButton>}
+                  <strong>{filter === "low" ? t("home.noLowStock") : selectedCategoryId !== null ? t("home.noCategoryProducts") : t("home.inventoryEmpty")}</strong>
+                  <p>{filter === "low" ? t("home.everythingStocked") : selectedCategoryId !== null ? t("home.noCategoryProducts") : t("home.addFirstProduct")}</p>
+                  {filter === "all" && selectedCategoryId === null && <S.AddButton type="button" onClick={openCreateModal}>+ {t("home.add")}</S.AddButton>}
                 </S.Vazio>
               )}
             </>
@@ -483,24 +514,24 @@ function Home() {
               </S.ProductPreview>
               <S.FormFields>
                 <S.Field>
-                  <label htmlFor="product-name">{t("home.name")}</label>
-                  <input id="product-name" autoFocus value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} placeholder={t("home.namePlaceholder")} />
+                  <label htmlFor="product-name">{t("home.name")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
+                  <input id="product-name" required autoFocus value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} placeholder={t("home.namePlaceholder")} />
                   {fieldErrors.nome && <S.FieldError id="product-name-error">{fieldErrors.nome}</S.FieldError>}
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-description">{t("home.description")}</label>
-                  <textarea id="product-description" rows="3" maxLength={DESCRIPTION_MAX_LENGTH} value={form.descricao} onChange={(event) => setForm({ ...form, descricao: event.target.value })} placeholder={t("home.descriptionPlaceholder")} />
+                  <textarea id="product-description" rows="3" maxLength={DESCRIPTION_MAX_LENGTH} value={form.descricao} onChange={(event) => setForm((current) => ({ ...current, descricao: event.target.value.slice(0, DESCRIPTION_MAX_LENGTH) }))} placeholder={t("home.descriptionPlaceholder")} />
                   <S.FieldHint>{t("home.descriptionLimit", { count: form.descricao.length, max: DESCRIPTION_MAX_LENGTH })}</S.FieldHint>
                   {fieldErrors.descricao && <S.FieldError>{fieldErrors.descricao}</S.FieldError>}
                 </S.Field>
                 <S.Field>
-                  <label htmlFor="product-price">{t("home.price")}</label>
-                  <input id="product-price" type="number" min="0" step="1" value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
+                  <label htmlFor="product-price">{t("home.price")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
+                  <input id="product-price" type="number" min="0" step="1" required value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
                   {fieldErrors.preco && <S.FieldError>{fieldErrors.preco}</S.FieldError>}
                 </S.Field>
                 <S.Field>
-                  <label htmlFor="product-quantity">{t("home.quantity")}</label>
-                  <input id="product-quantity" type="number" min="0" step="1" value={form.quantidade} onChange={(event) => setForm({ ...form, quantidade: event.target.value })} placeholder="0" />
+                  <label htmlFor="product-quantity">{t("home.quantity")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
+                  <input id="product-quantity" type="number" min="0" step="1" required value={form.quantidade} onChange={(event) => setForm({ ...form, quantidade: event.target.value })} placeholder="0" />
                   {fieldErrors.quantidade && <S.FieldError>{fieldErrors.quantidade}</S.FieldError>}
                 </S.Field>
                 <S.Field>
@@ -536,9 +567,10 @@ function Home() {
               <S.CloseButton type="button" onClick={() => setIsCategoryModalOpen(false)} aria-label={t("common.close")}>×</S.CloseButton>
             </S.ModalTop>
             <S.CategoryCreateForm onSubmit={saveCategory}>
-              <label htmlFor="new-category-name">{t("home.categoryName")}</label>
+              <label htmlFor="new-category-name">{t("home.categoryName")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
               <S.CategoryInput
                 id="new-category-name"
+                required
                 autoFocus
                 value={categoryName}
                 onChange={(event) => setCategoryName(event.target.value)}

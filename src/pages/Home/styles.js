@@ -158,18 +158,6 @@ export const AddButton = styled.button`
   @media (max-width: 520px) { padding: 0 12px; font-size: 12px; }
 `;
 
-export const CategoryButton = styled.button`
-  min-height: 42px;
-  padding: 0 14px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 13px;
-  color: var(--text-soft);
-  font-size: 12px;
-  font-weight: 600;
-  &:hover { background: var(--surface-raised); color: var(--txt); }
-  @media (max-width: 520px) { padding: 0 10px; font-size: 11px; }
-`;
-
 export const Destaques = styled.section`
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(130px, .75fr) minmax(130px, .75fr);
@@ -290,10 +278,14 @@ export const DeleteButton = styled.button`
 
 export const Abas = styled.div`
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
   padding: 0 16px 13px;
   border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
 `;
 
 export const Aba = styled.button`
@@ -301,6 +293,7 @@ export const Aba = styled.button`
   align-items: center;
   gap: 9px;
   min-height: 34px;
+  flex: none;
   padding: 0 13px;
   border-radius: 9px;
   color: ${({ $ativa }) => ($ativa ? "var(--txt)" : "var(--mut)")};
@@ -308,6 +301,40 @@ export const Aba = styled.button`
   font-size: 11px;
   span { color: ${({ $ativa }) => ($ativa ? "var(--txt)" : "var(--mut)")}; font-size: 10px; }
   &:hover { background: var(--surface-hover); }
+`;
+
+export const FilterSeparator = styled.span`
+  flex: none;
+  padding: 0 3px;
+  color: var(--mut);
+  font-size: 13px;
+`;
+
+export const CategoryFilterButton = styled.button`
+  min-height: 34px;
+  flex: none;
+  padding: 0 12px;
+  border-radius: 9px;
+  background: ${({ $ativa }) => ($ativa ? "var(--surface-raised)" : "transparent")};
+  color: ${({ $ativa }) => ($ativa ? "var(--txt)" : "var(--mut)")};
+  font-size: 11px;
+  &:hover { background: var(--surface-hover); color: var(--txt); }
+`;
+
+export const AddCategoryFilterButton = styled.button`
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  margin-left: 2px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  color: var(--text-soft);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+  &:hover { border-color: var(--accent-text); color: var(--txt); }
 `;
 
 export const Rolagem = styled.div`
@@ -638,6 +665,12 @@ export const FieldHint = styled.p`
   color: var(--mut);
   font-size: 9px;
   line-height: 1.2;
+`;
+
+export const RequiredMark = styled.span`
+  margin-left: 3px;
+  color: var(--accent-text);
+  font-weight: 700;
 `;
 
 export const CategoryItem = styled.li`

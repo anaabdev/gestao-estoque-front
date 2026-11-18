@@ -91,7 +91,7 @@ function Perfil() {
 
             <S.Form onSubmit={saveProfile}>
               <S.Field>
-                <label htmlFor="profile-full-name">{t("profile.fullName")}</label>
+                <label htmlFor="profile-full-name">{t("profile.fullName")}<H.RequiredMark aria-hidden="true">*</H.RequiredMark></label>
                 <input
                   id="profile-full-name"
                   type="text"
@@ -139,7 +139,7 @@ function Perfil() {
 
             <S.Form onSubmit={changePassword}>
               <S.Field>
-                <label htmlFor="current-password">{t("profile.currentPassword")}</label>
+                <label htmlFor="current-password">{t("profile.currentPassword")}<H.RequiredMark aria-hidden="true">*</H.RequiredMark></label>
                 <input
                   id="current-password"
                   type="password"
@@ -154,7 +154,7 @@ function Perfil() {
                 />
               </S.Field>
               <S.Field>
-                <label htmlFor="new-password">{t("profile.newPassword")}</label>
+                <label htmlFor="new-password">{t("profile.newPassword")}<H.RequiredMark aria-hidden="true">*</H.RequiredMark></label>
                 <input
                   id="new-password"
                   type="password"
