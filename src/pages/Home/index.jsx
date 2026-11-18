@@ -54,6 +54,9 @@ function Home() {
   const [quantityDrafts, setQuantityDrafts] = useState({});
   const [savingQuantities, setSavingQuantities] = useState([]);
   const [quantityMessages, setQuantityMessages] = useState({});
+  const [deletingProductIds, setDeletingProductIds] = useState([]);
+  const [deletingCategoryIds, setDeletingCategoryIds] = useState([]);
+  const [isRemovingSelected, setIsRemovingSelected] = useState(false);
 
   const loadInventory = useCallback(async ({ quiet = false } = {}) => {
     if (!quiet) setLoading(true);
@@ -236,6 +239,7 @@ function Home() {
   }
 
   async function deleteCategory(id) {
+    setDeletingCategoryIds((current) => [...new Set([...current, id])]);
     setCategoryError("");
     try {
       await api.excluirCategoria(id);
@@ -243,6 +247,8 @@ function Home() {
       if (selectedCategoryId === id) setSelectedCategoryId(null);
     } catch (requestError) {
       setCategoryError(requestError.message || t("home.categoryDeleteFailed"));
+    } finally {
+      setDeletingCategoryIds((current) => current.filter((categoryId) => categoryId !== id));
     }
   }
 
@@ -258,13 +264,21 @@ function Home() {
       : [...new Set([...current, ...visibleProducts.map((product) => product.id)])]);
   }
 
-  async function removeProducts(ids) {
+  async function removeProducts(ids, fromBulkAction = false) {
+    const idsToRemove = [...new Set(ids)];
+    setDeletingProductIds((current) => [...new Set([...current, ...idsToRemove])]);
+    if (fromBulkAction) setIsRemovingSelected(true);
     setError("");
-    const results = await Promise.allSettled(ids.map((id) => api.excluirProduto(id)));
-    setSelectedIds((current) => current.filter((id) => !ids.includes(id)));
-    await loadInventory({ quiet: true });
-    const failed = results.find((result) => result.status === "rejected");
-    if (failed) setError(failed.reason?.message || t("home.loadError"));
+    try {
+      const results = await Promise.allSettled(idsToRemove.map((id) => api.excluirProduto(id)));
+      setSelectedIds((current) => current.filter((id) => !idsToRemove.includes(id)));
+      await loadInventory({ quiet: true });
+      const failed = results.find((result) => result.status === "rejected");
+      if (failed) setError(failed.reason?.message || t("home.loadError"));
+    } finally {
+      setDeletingProductIds((current) => current.filter((id) => !idsToRemove.includes(id)));
+      if (fromBulkAction) setIsRemovingSelected(false);
+    }
   }
 
   async function saveQuantity(product, rawValue) {
@@ -373,8 +387,9 @@ function Home() {
             {selectedIds.length > 0 && (
               <S.BulkActions>
                 <span>{selectedIds.length} {t("home.selected")}</span>
-                <S.DeleteButton type="button" onClick={() => removeProducts(selectedIds)}>
-                  {t("home.removeSelected")}
+                <S.DeleteButton type="button" disabled={isRemovingSelected} aria-busy={isRemovingSelected} onClick={() => removeProducts(selectedIds, true)}>
+                  {isRemovingSelected && <S.LoadingSpinner aria-hidden="true" />}
+                  {isRemovingSelected ? t("home.deleting") : t("home.removeSelected")}
                 </S.DeleteButton>
               </S.BulkActions>
             )}
@@ -477,8 +492,10 @@ function Home() {
                               <S.RowEdit type="button" onClick={() => openEditModal(product)} aria-label={t("home.editProduct", { name: productName })} title={t("home.edit")}>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" /></svg>
                               </S.RowEdit>
-                              <S.RowDelete type="button" onClick={() => removeProducts([product.id])} aria-label={t("home.removeProduct", { name: productName })} title={t("home.removeProduct", { name: productName })}>
-                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+                              <S.RowDelete type="button" disabled={deletingProductIds.includes(product.id)} aria-busy={deletingProductIds.includes(product.id)} onClick={() => removeProducts([product.id])} aria-label={t("home.removeProduct", { name: productName })} title={t("home.removeProduct", { name: productName })}>
+                                {deletingProductIds.includes(product.id)
+                                  ? <S.LoadingSpinner aria-hidden="true" />
+                                  : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>}
                               </S.RowDelete>
                             </S.RowActions>
                           </td>
@@ -508,14 +525,14 @@ function Home() {
               <h2 id="product-modal-title">{editingProduct ? t("home.editModalTitle") : t("home.modalTitle")}</h2>
               <S.CloseButton type="button" onClick={closeModal} aria-label={t("common.close")}>×</S.CloseButton>
             </S.ModalTop>
-            <S.ProductForm onSubmit={saveProduct}>
+            <S.ProductForm noValidate onSubmit={saveProduct}>
               <S.ProductPreview aria-hidden="true">
                 <S.BoxIcon><span /></S.BoxIcon>
               </S.ProductPreview>
               <S.FormFields>
                 <S.Field>
                   <label htmlFor="product-name">{t("home.name")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
-                  <input id="product-name" required autoFocus value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} placeholder={t("home.namePlaceholder")} />
+                  <input id="product-name" aria-required="true" autoFocus value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} placeholder={t("home.namePlaceholder")} />
                   {fieldErrors.nome && <S.FieldError id="product-name-error">{fieldErrors.nome}</S.FieldError>}
                 </S.Field>
                 <S.Field>
@@ -526,12 +543,12 @@ function Home() {
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-price">{t("home.price")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
-                  <input id="product-price" type="number" min="0" step="1" required value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
+                  <input id="product-price" type="number" min="0" step="1" aria-required="true" value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
                   {fieldErrors.preco && <S.FieldError>{fieldErrors.preco}</S.FieldError>}
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-quantity">{t("home.quantity")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
-                  <input id="product-quantity" type="number" min="0" step="1" required value={form.quantidade} onChange={(event) => setForm({ ...form, quantidade: event.target.value })} placeholder="0" />
+                  <input id="product-quantity" type="number" min="0" step="1" aria-required="true" value={form.quantidade} onChange={(event) => setForm({ ...form, quantidade: event.target.value })} placeholder="0" />
                   {fieldErrors.quantidade && <S.FieldError>{fieldErrors.quantidade}</S.FieldError>}
                 </S.Field>
                 <S.Field>
@@ -566,11 +583,11 @@ function Home() {
               <h2 id="category-modal-title">{t("home.manageCategories")}</h2>
               <S.CloseButton type="button" onClick={() => setIsCategoryModalOpen(false)} aria-label={t("common.close")}>×</S.CloseButton>
             </S.ModalTop>
-            <S.CategoryCreateForm onSubmit={saveCategory}>
+            <S.CategoryCreateForm noValidate onSubmit={saveCategory}>
               <label htmlFor="new-category-name">{t("home.categoryName")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
               <S.CategoryInput
                 id="new-category-name"
-                required
+                aria-required="true"
                 autoFocus
                 value={categoryName}
                 onChange={(event) => setCategoryName(event.target.value)}
@@ -594,8 +611,10 @@ function Home() {
                         <S.RowEdit type="button" onClick={() => openEditCategory(category)} aria-label={t("home.editCategory", { name: category.nome })} title={t("home.edit")}>
                           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" /></svg>
                         </S.RowEdit>
-                        <S.RowDelete type="button" onClick={() => deleteCategory(category.id)} aria-label={t("home.removeCategory", { name: category.nome })} title={t("home.removeCategory", { name: category.nome })}>
-                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+                        <S.RowDelete type="button" disabled={deletingCategoryIds.includes(category.id)} aria-busy={deletingCategoryIds.includes(category.id)} onClick={() => deleteCategory(category.id)} aria-label={t("home.removeCategory", { name: category.nome })} title={t("home.removeCategory", { name: category.nome })}>
+                          {deletingCategoryIds.includes(category.id)
+                            ? <S.LoadingSpinner aria-hidden="true" />
+                            : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>}
                         </S.RowDelete>
                       </S.CategoryActions>
                     </S.CategoryItem>

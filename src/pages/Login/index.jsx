@@ -26,9 +26,23 @@ function Login() {
   async function entrar(event) {
     event.preventDefault();
     setErro("");
+    const emailNormalizado = email.trim();
+    if (!emailNormalizado) {
+      setErro(t("login.emailRequired"));
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNormalizado)) {
+      setErro(t("login.emailInvalid"));
+      return;
+    }
+    if (!senha) {
+      setErro(t("login.passwordRequired"));
+      return;
+    }
+
     setCarregando(true);
     try {
-      await api.login(email, senha);
+      await api.login(emailNormalizado, senha);
       navigate("/home");
     } catch (requestError) {
       setErro(requestError.message || "Não foi possível entrar.");
@@ -43,7 +57,7 @@ function Login() {
 
   return (
     <S.Pagina>
-      <S.Card onSubmit={entrar}>
+      <S.Card noValidate onSubmit={entrar}>
         <S.Logo src={Logo} alt={t("brand.logo")} />
         <S.Titulo>{t("login.title")}</S.Titulo>
 
@@ -58,7 +72,7 @@ function Login() {
             autoComplete="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            required
+            aria-required="true"
           />
         </S.Campo>
 
@@ -71,7 +85,7 @@ function Login() {
             autoComplete="current-password"
             value={senha}
             onChange={(event) => setSenha(event.target.value)}
-            required
+            aria-required="true"
             $comOlho
           />
           <S.Olho type="button" onClick={() => setMostrarSenha((show) => !show)} aria-label={t("login.showPassword")}>

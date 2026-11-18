@@ -274,6 +274,7 @@ export const DeleteButton = styled.button`
   color: var(--accent-text);
   font-size: 11px;
   &:hover { background: var(--accent-surface); }
+  &:disabled { opacity: .65; cursor: wait; }
 `;
 
 export const Abas = styled.div`
@@ -419,6 +420,19 @@ export const RowDelete = styled.button`
   color: var(--mut);
   svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   &:hover { background: var(--accent-surface); color: var(--accent-text); }
+  &:disabled { opacity: .65; cursor: wait; }
+`;
+
+export const LoadingSpinner = styled.span`
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  flex: none;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: loading-spin .7s linear infinite;
+  @keyframes loading-spin { to { transform: rotate(360deg); } }
 `;
 
 export const RowActions = styled.div`
@@ -443,16 +457,16 @@ export const InlineQuantity = styled.input`
   width: 78px;
   height: 32px;
   padding: 0 7px;
-  border: 1px solid transparent;
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   outline: none;
-  background: transparent;
+  background: var(--surface-field);
   color: var(--txt);
   text-align: center;
   font: inherit;
   font-size: 12px;
   transition: border-color .15s ease, background .15s ease;
-  &:hover { border-color: var(--border-subtle); background: var(--surface-raised); }
+  &:hover { border-color: var(--border-strong); background: var(--surface-raised); }
   &:focus { border-color: var(--accent-text); background: var(--surface-field); }
   &:disabled { opacity: .6; cursor: wait; }
 `;
@@ -630,7 +644,14 @@ export const Field = styled.div`
     &::placeholder { color: var(--input-placeholder); }
     &[type="number"] { max-width: 150px; justify-self: end; }
   }
-  textarea { resize: vertical; font-family: inherit; }
+  textarea {
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
+    overflow-y: auto;
+    resize: none;
+    font-family: inherit;
+  }
   select { cursor: pointer; }
 `;
 

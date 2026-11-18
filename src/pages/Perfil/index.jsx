@@ -31,8 +31,14 @@ function Perfil() {
 
   function saveProfile(event) {
     event.preventDefault();
+    const fullName = String(profile.fullName ?? "").trim();
+    if (!fullName) {
+      setProfileMessage(t("profile.fullNameRequired"));
+      return;
+    }
     try {
-      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({ ...profile, fullName }));
+      setProfile((current) => ({ ...current, fullName }));
       setProfileMessage(t("profile.saved"));
     } catch {
       setProfileMessage(t("profile.saveFailed"));
@@ -41,6 +47,14 @@ function Perfil() {
 
   function changePassword(event) {
     event.preventDefault();
+    if (!password.current) {
+      setPasswordMessage(t("profile.currentPasswordRequired"));
+      return;
+    }
+    if (!password.next) {
+      setPasswordMessage(t("profile.newPasswordRequired"));
+      return;
+    }
     if (password.next.length < 8) {
       setPasswordMessage(t("profile.passwordMinLength"));
       return;
@@ -89,7 +103,7 @@ function Perfil() {
               </div>
             </S.SectionHeading>
 
-            <S.Form onSubmit={saveProfile}>
+            <S.Form noValidate onSubmit={saveProfile}>
               <S.Field>
                 <label htmlFor="profile-full-name">{t("profile.fullName")}<H.RequiredMark aria-hidden="true">*</H.RequiredMark></label>
                 <input
@@ -103,7 +117,7 @@ function Perfil() {
                     setProfile({ ...profile, fullName: event.target.value });
                     setProfileMessage("");
                   }}
-                  required
+                  aria-required="true"
                 />
               </S.Field>
               <S.Field>
@@ -137,7 +151,7 @@ function Perfil() {
               </div>
             </S.SectionHeading>
 
-            <S.Form onSubmit={changePassword}>
+            <S.Form noValidate onSubmit={changePassword}>
               <S.Field>
                 <label htmlFor="current-password">{t("profile.currentPassword")}<H.RequiredMark aria-hidden="true">*</H.RequiredMark></label>
                 <input
@@ -150,7 +164,7 @@ function Perfil() {
                     setPassword({ ...password, current: event.target.value });
                     setPasswordMessage("");
                   }}
-                  required
+                  aria-required="true"
                 />
               </S.Field>
               <S.Field>
@@ -166,7 +180,7 @@ function Perfil() {
                     setPasswordMessage("");
                   }}
                   minLength={8}
-                  required
+                  aria-required="true"
                 />
               </S.Field>
               <S.FormFooter>

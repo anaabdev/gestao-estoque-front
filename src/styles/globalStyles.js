@@ -93,6 +93,7 @@ export default createGlobalStyle`
   button, input, select { font: inherit; }
   button { color: inherit; background: none; border: 0; cursor: pointer; }
   a { color: inherit; text-decoration: none; }
+  img { user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
   :focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
 
   html[data-theme="light"] aside img,
