@@ -41,6 +41,8 @@ function Home() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [productRemovalPrompt, setProductRemovalPrompt] = useState(null);
+  const [isConfirmingProductRemoval, setIsConfirmingProductRemoval] = useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [categoryError, setCategoryError] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
@@ -96,16 +98,17 @@ function Home() {
   }, [t]);
 
   useEffect(() => {
-    if (!isModalOpen && !isCategoryModalOpen) return undefined;
+    if (!isModalOpen && !isCategoryModalOpen && !productRemovalPrompt) return undefined;
     const closeOnEscape = (event) => {
       if (event.key === "Escape") {
         if (isModalOpen) closeModal();
         if (isCategoryModalOpen) setIsCategoryModalOpen(false);
+        if (productRemovalPrompt && !isConfirmingProductRemoval) setProductRemovalPrompt(null);
       }
     };
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [isModalOpen, isCategoryModalOpen]);
+  }, [isModalOpen, isCategoryModalOpen, productRemovalPrompt, isConfirmingProductRemoval]);
 
   const lowStockCount = products.filter(
     (product) => product.ativo && Number(product.quantidade) < LOW_STOCK_LIMIT,
@@ -281,6 +284,23 @@ function Home() {
     }
   }
 
+  function askToRemoveProducts(ids, fromBulkAction = false) {
+    const idsToRemove = [...new Set(ids)];
+    if (idsToRemove.length === 0) return;
+    setProductRemovalPrompt({ ids: idsToRemove, fromBulkAction });
+  }
+
+  async function confirmProductRemoval() {
+    if (!productRemovalPrompt || isConfirmingProductRemoval) return;
+    setIsConfirmingProductRemoval(true);
+    try {
+      await removeProducts(productRemovalPrompt.ids, productRemovalPrompt.fromBulkAction);
+    } finally {
+      setIsConfirmingProductRemoval(false);
+      setProductRemovalPrompt(null);
+    }
+  }
+
   async function saveQuantity(product, rawValue) {
     const quantity = Number(rawValue);
     const currentQuantity = Number(product.quantidade);
@@ -387,7 +407,7 @@ function Home() {
             {selectedIds.length > 0 && (
               <S.BulkActions>
                 <span>{selectedIds.length} {t("home.selected")}</span>
-                <S.DeleteButton type="button" disabled={isRemovingSelected} aria-busy={isRemovingSelected} onClick={() => removeProducts(selectedIds, true)}>
+                <S.DeleteButton type="button" disabled={isRemovingSelected} onClick={() => askToRemoveProducts(selectedIds, true)}>
                   {isRemovingSelected && <S.LoadingSpinner aria-hidden="true" />}
                   {isRemovingSelected ? t("home.deleting") : t("home.removeSelected")}
                 </S.DeleteButton>
@@ -492,7 +512,7 @@ function Home() {
                               <S.RowEdit type="button" onClick={() => openEditModal(product)} aria-label={t("home.editProduct", { name: productName })} title={t("home.edit")}>
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" /></svg>
                               </S.RowEdit>
-                              <S.RowDelete type="button" disabled={deletingProductIds.includes(product.id)} aria-busy={deletingProductIds.includes(product.id)} onClick={() => removeProducts([product.id])} aria-label={t("home.removeProduct", { name: productName })} title={t("home.removeProduct", { name: productName })}>
+                              <S.RowDelete type="button" disabled={deletingProductIds.includes(product.id)} aria-busy={deletingProductIds.includes(product.id)} onClick={() => askToRemoveProducts([product.id])} aria-label={t("home.removeProduct", { name: productName })} title={t("home.removeProduct", { name: productName })}>
                                 {deletingProductIds.includes(product.id)
                                   ? <S.LoadingSpinner aria-hidden="true" />
                                   : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>}
@@ -623,6 +643,40 @@ function Home() {
           </S.Dialog>
         </S.Overlay>
       )}
+
+      {productRemovalPrompt && (() => {
+        const { ids } = productRemovalPrompt;
+        const product = ids.length === 1
+          ? products.find((item) => item.id === ids[0])
+          : null;
+        const closePrompt = () => {
+          if (!isConfirmingProductRemoval) setProductRemovalPrompt(null);
+        };
+
+        return (
+          <S.Overlay onMouseDown={(event) => event.target === event.currentTarget && closePrompt()}>
+            <S.ConfirmDialog role="alertdialog" aria-modal="true" aria-labelledby="remove-products-title" aria-describedby="remove-products-message remove-products-warning">
+              <S.ModalTop>
+                <h2 id="remove-products-title">{t("home.confirmRemoveTitle")}</h2>
+                <S.CloseButton type="button" onClick={closePrompt} disabled={isConfirmingProductRemoval} aria-label={t("common.close")}>×</S.CloseButton>
+              </S.ModalTop>
+              <S.ConfirmMessage id="remove-products-message">
+                {product
+                  ? t("home.confirmRemoveProduct", { name: product.nome })
+                  : t("home.confirmRemoveProducts", { count: ids.length })}
+              </S.ConfirmMessage>
+              <S.ConfirmWarning id="remove-products-warning">{t("home.confirmRemoveWarning")}</S.ConfirmWarning>
+              <S.FormFooter>
+                <S.CancelButton type="button" onClick={closePrompt} disabled={isConfirmingProductRemoval} autoFocus>{t("common.cancel")}</S.CancelButton>
+                <S.DeleteButton type="button" onClick={confirmProductRemoval} disabled={isConfirmingProductRemoval} aria-busy={isConfirmingProductRemoval}>
+                  {isConfirmingProductRemoval && <S.LoadingSpinner aria-hidden="true" />}
+                  {isConfirmingProductRemoval ? t("home.deleting") : t("home.confirmRemove")}
+                </S.DeleteButton>
+              </S.FormFooter>
+            </S.ConfirmDialog>
+          </S.Overlay>
+        );
+      })()}
     </S.Shell>
   );
 }

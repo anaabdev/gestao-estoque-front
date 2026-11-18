@@ -548,6 +548,26 @@ export const Dialog = styled.section`
   @media (max-width: 620px) { padding: 25px 20px 22px; border-radius: 28px; }
 `;
 
+export const ConfirmDialog = styled(Dialog)`
+  width: min(460px, 100%);
+  padding: 28px;
+  @media (max-width: 620px) { padding: 22px 18px; }
+`;
+
+export const ConfirmMessage = styled.p`
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+`;
+
+export const ConfirmWarning = styled.p`
+  margin-top: 8px;
+  color: var(--accent-text);
+  font-size: 12px;
+  line-height: 1.45;
+`;
+
 export const ModalTop = styled.div`
   display: flex;
   align-items: center;
