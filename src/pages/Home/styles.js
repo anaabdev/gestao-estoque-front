@@ -487,9 +487,14 @@ export const InlineQuantity = styled.input`
 `;
 
 export const QuantityMessage = styled.span`
-  min-height: 11px;
+  min-height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   color: var(--mut);
   font-size: 9px;
+  white-space: nowrap;
 `;
 
 export const StatusPill = styled.span`

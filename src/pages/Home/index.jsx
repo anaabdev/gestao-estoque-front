@@ -475,6 +475,7 @@ function Home() {
                   <tbody>
                     {visibleProducts.map((product) => {
                       const productName = product.nome;
+                      const isQuantitySaving = savingQuantities.includes(product.id);
                       return (
                         <S.Linha key={product.id} $marcada={selectedIds.includes(product.id)} $inativo={!product.ativo}>
                           <td>
@@ -503,12 +504,17 @@ function Home() {
                                 min="0"
                                 step="1"
                                 value={quantityDrafts[product.id] ?? String(product.quantidade)}
-                                disabled={savingQuantities.includes(product.id)}
+                                disabled={isQuantitySaving}
+                                aria-busy={isQuantitySaving}
                                 onChange={(event) => setQuantityDrafts((current) => ({ ...current, [product.id]: event.target.value }))}
                                 onBlur={(event) => saveQuantity(product, event.target.value)}
                                 onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }}
                               />
-                              <S.QuantityMessage aria-live="polite">{quantityMessages[product.id] || ""}</S.QuantityMessage>
+                              <S.QuantityMessage role="status" aria-live="polite">
+                                {isQuantitySaving
+                                  ? <><S.LoadingSpinner aria-hidden="true" />{t("home.savingQuantity")}</>
+                                  : quantityMessages[product.id] || ""}
+                              </S.QuantityMessage>
                             </S.QuantityCell>
                           </td>
                           <td><S.StatusPill $active={product.ativo}>{product.ativo ? t("home.active") : t("home.inactive")}</S.StatusPill></td>
