@@ -1,10 +1,8 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAppSettings } from "../../context/useAppSettings.js";
-import { api } from "../../services/api.js";
+import { api } from "../services/api.js";
 import { useEffect, useState } from "react";
 
 function ProtectedRoute({ children }) {
-  const { t } = useAppSettings();
   const location = useLocation();
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
