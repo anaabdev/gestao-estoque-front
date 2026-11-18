@@ -271,7 +271,21 @@ export const TableHeader = styled.div`
   padding: 0 22px 16px;
   h2 { margin-bottom: 4px; font-size: 16px; }
   p { color: var(--mut); font-size: 11px; }
-  @media (max-width: 600px) { padding: 0 14px 14px; }
+  @media (max-width: 600px) { flex-wrap: wrap; padding: 0 14px 14px; }
+`;
+
+export const TableHeaderActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+  @media (max-width: 600px) {
+    flex: 1 0 100%;
+    justify-content: flex-start;
+  }
 `;
 
 export const BulkActions = styled.div`
@@ -304,20 +318,16 @@ export const Abas = styled.div`
   scrollbar-width: thin;
 `;
 
-export const SearchRow = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  padding: 12px 20px 0;
-  @media (max-width: 600px) { padding: 10px 14px 0; }
-`;
-
 export const SearchWrap = styled.div`
   position: relative;
   width: min(320px, 100%);
+  flex: 0 1 320px;
+  min-width: min(220px, 100%);
   border: 1px solid var(--input-border);
   border-radius: 10px;
   background: var(--surface-field);
   &:focus-within { border-color: var(--accent-text); }
+  @media (max-width: 600px) { flex: 1 1 220px; }
 `;
 
 export const SearchIcon = styled.svg`

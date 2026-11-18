@@ -427,15 +427,30 @@ function Home() {
               <h2>{t("home.products")}</h2>
               <p>{t("home.manageProducts")}</p>
             </div>
-            {selectedIds.length > 0 && (
-              <S.BulkActions>
-                <span>{selectedIds.length} {t("home.selected")}</span>
-                <S.DeleteButton type="button" disabled={isRemovingSelected} onClick={() => askToRemoveProducts(selectedIds, true)}>
-                  {isRemovingSelected && <S.LoadingSpinner aria-hidden="true" />}
-                  {isRemovingSelected ? t("home.deleting") : t("home.removeSelected")}
-                </S.DeleteButton>
-              </S.BulkActions>
-            )}
+            <S.TableHeaderActions>
+              <S.SearchWrap>
+                <S.SearchIcon viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="10.8" cy="10.8" r="6.3" />
+                  <path d="m15.5 15.5 4.2 4.2" />
+                </S.SearchIcon>
+                <S.SearchInput
+                  type="search"
+                  aria-label={t("home.searchProducts")}
+                  placeholder={t("home.searchProducts")}
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                />
+              </S.SearchWrap>
+              {selectedIds.length > 0 && (
+                <S.BulkActions>
+                  <span>{selectedIds.length} {t("home.selected")}</span>
+                  <S.DeleteButton type="button" disabled={isRemovingSelected} onClick={() => askToRemoveProducts(selectedIds, true)}>
+                    {isRemovingSelected && <S.LoadingSpinner aria-hidden="true" />}
+                    {isRemovingSelected ? t("home.deleting") : t("home.removeSelected")}
+                  </S.DeleteButton>
+                </S.BulkActions>
+              )}
+            </S.TableHeaderActions>
           </S.TableHeader>
 
           <S.Abas aria-label={t("home.filterProducts")}>
@@ -466,22 +481,6 @@ function Home() {
               +
             </S.AddCategoryFilterButton>
           </S.Abas>
-
-          <S.SearchRow>
-            <S.SearchWrap>
-              <S.SearchIcon viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="10.8" cy="10.8" r="6.3" />
-                <path d="m15.5 15.5 4.2 4.2" />
-              </S.SearchIcon>
-              <S.SearchInput
-                type="search"
-                aria-label={t("home.searchProducts")}
-                placeholder={t("home.searchProducts")}
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-              />
-            </S.SearchWrap>
-          </S.SearchRow>
 
           {error && <S.Alert role="alert">{error}</S.Alert>}
           {loading ? (
