@@ -23,6 +23,9 @@ export const api = {
 
   listarCategorias: () => request('/categorias'),
 
+  criarCategoria: (nome) =>
+    request('/categorias', { method: 'POST', body: JSON.stringify({ nome }) }),
+
   buscarProduto: (id) => request(`/produtos/${id}`),
 
   criarProduto: (dados) =>

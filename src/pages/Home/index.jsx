@@ -31,6 +31,10 @@ function Home() {
   const [filter, setFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryError, setCategoryError] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
@@ -78,13 +82,16 @@ function Home() {
   }, [t]);
 
   useEffect(() => {
-    if (!isModalOpen) return undefined;
+    if (!isModalOpen && !isCategoryModalOpen) return undefined;
     const closeOnEscape = (event) => {
-      if (event.key === "Escape") closeModal();
+      if (event.key === "Escape") {
+        if (isModalOpen) closeModal();
+        if (isCategoryModalOpen) setIsCategoryModalOpen(false);
+      }
     };
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [isModalOpen]);
+  }, [isModalOpen, isCategoryModalOpen]);
 
   const lowStockCount = products.filter(
     (product) => product.ativo && Number(product.quantidade) < LOW_STOCK_LIMIT,
@@ -164,6 +171,27 @@ function Home() {
       setFormError(requestError.message || t("home.productSaveFailed"));
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function saveCategory(event) {
+    event.preventDefault();
+    const nome = categoryName.trim();
+    if (!nome) {
+      setCategoryError(t("home.categoryNameRequired"));
+      return;
+    }
+
+    setSavingCategory(true);
+    setCategoryError("");
+    try {
+      const category = await api.criarCategoria(nome);
+      setCategories((current) => [...current, category].sort((first, second) => first.nome.localeCompare(second.nome)));
+      setCategoryName("");
+    } catch (requestError) {
+      setCategoryError(requestError.message || t("home.categorySaveFailed"));
+    } finally {
+      setSavingCategory(false);
     }
   }
 
@@ -259,6 +287,9 @@ function Home() {
             <h1>{t("home.title")}</h1>
           </div>
           <S.TopActions>
+            <S.CategoryButton type="button" onClick={() => { setCategoryError(""); setIsCategoryModalOpen(true); }}>
+              {t("home.manageCategories")}
+            </S.CategoryButton>
             <S.AddButton type="button" onClick={openCreateModal}>
               <span aria-hidden="true">+</span> {t("home.add")}
             </S.AddButton>
@@ -419,7 +450,7 @@ function Home() {
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-price">{t("home.price")}</label>
-                  <input id="product-price" type="number" min="0" step="0.01" value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
+                  <input id="product-price" type="number" min="0" step="1" value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-quantity">{t("home.quantity")}</label>
@@ -445,6 +476,39 @@ function Home() {
                 </S.FormFooter>
               </S.FormFields>
             </S.ProductForm>
+          </S.Dialog>
+        </S.Overlay>
+      )}
+
+      {isCategoryModalOpen && (
+        <S.Overlay onMouseDown={(event) => event.target === event.currentTarget && setIsCategoryModalOpen(false)}>
+          <S.Dialog role="dialog" aria-modal="true" aria-labelledby="category-modal-title">
+            <S.ModalTop>
+              <h2 id="category-modal-title">{t("home.manageCategories")}</h2>
+              <S.CloseButton type="button" onClick={() => setIsCategoryModalOpen(false)} aria-label={t("common.close")}>×</S.CloseButton>
+            </S.ModalTop>
+            <S.CategoryCreateForm onSubmit={saveCategory}>
+              <label htmlFor="new-category-name">{t("home.categoryName")}</label>
+              <S.CategoryInput
+                id="new-category-name"
+                autoFocus
+                value={categoryName}
+                onChange={(event) => setCategoryName(event.target.value)}
+                placeholder={t("home.categoryNamePlaceholder")}
+              />
+              {categoryError && <S.CategoryError role="alert">{categoryError}</S.CategoryError>}
+              <S.FormFooter>
+                <S.CancelButton type="button" onClick={() => setIsCategoryModalOpen(false)}>{t("common.cancel")}</S.CancelButton>
+                <S.SaveButton type="submit" disabled={savingCategory}>
+                  {savingCategory ? t("home.loading") : t("home.addCategory")}
+                </S.SaveButton>
+              </S.FormFooter>
+            </S.CategoryCreateForm>
+            <S.CategoryList aria-label={t("home.manageCategories")}>
+              {categories.length === 0
+                ? <S.CategoryEmpty>{t("home.categoriesEmpty")}</S.CategoryEmpty>
+                : categories.map((category) => <li key={category.id}>{category.nome}</li>)}
+            </S.CategoryList>
           </S.Dialog>
         </S.Overlay>
       )}

@@ -158,6 +158,18 @@ export const AddButton = styled.button`
   @media (max-width: 520px) { padding: 0 12px; font-size: 12px; }
 `;
 
+export const CategoryButton = styled.button`
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 13px;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+  &:hover { background: var(--surface-raised); color: var(--txt); }
+  @media (max-width: 520px) { padding: 0 10px; font-size: 11px; }
+`;
+
 export const Destaques = styled.section`
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(130px, .75fr) minmax(130px, .75fr);
@@ -616,6 +628,57 @@ export const FormFooter = styled.div`
   justify-content: flex-end;
   gap: 9px;
   margin-top: 8px;
+`;
+
+export const CategoryCreateForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  label { color: var(--text-soft); font-size: 12px; }
+`;
+
+export const CategoryInput = styled.input`
+  width: 100%;
+  min-height: 40px;
+  padding: 0 11px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  outline: none;
+  background: var(--surface-field);
+  color: var(--txt);
+  font: inherit;
+  font-size: 12px;
+  &:focus { border-color: var(--accent-text); background: var(--surface-raised); }
+  &::placeholder { color: var(--input-placeholder); }
+`;
+
+export const CategoryError = styled.p`
+  color: var(--accent-text);
+  font-size: 11px;
+  line-height: 1.4;
+`;
+
+export const CategoryList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  li {
+    padding: 10px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 9px;
+    color: var(--txt);
+    font-size: 12px;
+  }
+`;
+
+export const CategoryEmpty = styled.li`
+  color: var(--mut) !important;
+  text-align: center;
 `;
 
 export const CancelButton = styled.button`
