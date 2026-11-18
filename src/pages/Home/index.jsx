@@ -241,6 +241,13 @@ function Home() {
     setIsCategoryModalOpen(true);
   }
 
+  function openCategoryModal() {
+    setCategoryName("");
+    setEditingCategoryId(null);
+    setCategoryError("");
+    setIsCategoryModalOpen(true);
+  }
+
   async function deleteCategory(id) {
     setDeletingCategoryIds((current) => [...new Set([...current, id])]);
     setCategoryError("");
@@ -372,6 +379,9 @@ function Home() {
             <h1>{t("home.title")}</h1>
           </div>
           <S.TopActions>
+            <S.TopCategoryButton type="button" onClick={openCategoryModal}>
+              {t("home.manageCategories")}
+            </S.TopCategoryButton>
             <S.AddButton type="button" onClick={openCreateModal}>
               <span aria-hidden="true">+</span> {t("home.add")}
             </S.AddButton>
@@ -438,12 +448,7 @@ function Home() {
               type="button"
               aria-label={t("home.addCategory")}
               title={t("home.addCategory")}
-              onClick={() => {
-                setCategoryName("");
-                setEditingCategoryId(null);
-                setCategoryError("");
-                setIsCategoryModalOpen(true);
-              }}
+              onClick={openCategoryModal}
             >
               +
             </S.AddCategoryFilterButton>

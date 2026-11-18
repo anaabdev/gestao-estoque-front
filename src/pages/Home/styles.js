@@ -124,6 +124,21 @@ export const TopActions = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  @media (max-width: 520px) { gap: 7px; }
+`;
+
+export const TopCategoryButton = styled.button`
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 13px;
+  background: var(--surface-main);
+  color: var(--txt);
+  font-size: 12px;
+  font-weight: 650;
+  transition: transform .16s ease, background .16s ease;
+  &:hover { transform: translateY(-1px); background: var(--surface-raised); }
+  @media (max-width: 520px) { min-height: 40px; padding: 0 9px; font-size: 10px; }
 `;
 
 export const Perfil = styled(Link)`
