@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import * as S from "./styles";
@@ -14,6 +14,14 @@ function Login() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    api.me()
+      .then(() => navigate("/home"))
+      .catch(() => {})
+      .finally(() => setCheckingAuth(false));
+  }, [navigate]);
 
   async function entrar(event) {
     event.preventDefault();
@@ -27,6 +35,10 @@ function Login() {
     } finally {
       setCarregando(false);
     }
+  }
+
+  if (checkingAuth) {
+    return <S.Pagina><S.Loading>Carregando...</S.Loading></S.Pagina>;
   }
 
   return (

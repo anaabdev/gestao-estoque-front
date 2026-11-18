@@ -6,7 +6,7 @@ import Home from './pages/Home/index.jsx'
 import Login from './pages/Login/index.jsx'
 import Perfil from './pages/Perfil/index.jsx'
 import Configuracoes from './pages/Configuracoes/index.jsx'
-
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 
 import "@fontsource-variable/inter";
@@ -21,17 +21,39 @@ createRoot(document.getElementById('root')).render(
         <GlobalStyles />
 
         <Routes>
-          <Route path="/" element={
-            <>
-              <Header />
-              <Login />
-            </>
-          } />
-
           <Route path="/login" element={<Login />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/configuracoes" element={<Configuracoes />} />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <>
+                <Header />
+                <Home />
+              </>
+            </ProtectedRoute>
+          } />
+          <Route path="/home" element={
+            <ProtectedRoute>
+              <>
+                <Header />
+                <Home />
+              </>
+            </ProtectedRoute>
+          } />
+          <Route path="/perfil" element={
+            <ProtectedRoute>
+              <>
+                <Header />
+                <Perfil />
+              </>
+            </ProtectedRoute>
+          } />
+          <Route path="/configuracoes" element={
+            <ProtectedRoute>
+              <>
+                <Header />
+                <Configuracoes />
+              </>
+            </ProtectedRoute>
+          } />
         </Routes>
       </BrowserRouter>
     </AppSettingsProvider>

@@ -493,7 +493,7 @@ function Home() {
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-price">{t("home.price")}</label>
-                  <input id="product-price" type="number" min="0" step="0.01" value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
+                  <input id="product-price" type="number" min="0" step="1" value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
                   {fieldErrors.preco && <S.FieldError>{fieldErrors.preco}</S.FieldError>}
                 </S.Field>
                 <S.Field>

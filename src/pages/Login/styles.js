@@ -133,3 +133,11 @@ export const Footer = styled.footer`
 
   p { font-size: 13px; color: var(--mut); }
 `;
+
+export const Loading = styled.div`
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+  color: var(--mut);
+  font-size: 14px;
+`;
