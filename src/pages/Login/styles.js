@@ -49,14 +49,18 @@ export const Campo = styled.div`
   &:last-of-type { margin-bottom: 0; }
 `;
 
-/* Escondido da tela, mas lido por leitores de tela (o design usa só placeholder) */
 export const Label = styled.label`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+  display: block;
+  margin-bottom: 6px;
+  color: var(--mut);
+  font-size: 12px;
+  font-weight: 550;
+`;
+
+export const RequiredMark = styled.span`
+  margin-left: 3px;
+  color: var(--accent-text);
+  font-weight: 700;
 `;
 
 export const Input = styled.input`
@@ -77,7 +81,7 @@ export const Input = styled.input`
 
 export const Olho = styled.button`
   position: absolute;
-  top: 0;
+  top: 20px;
   right: 4px;
   width: 40px;
   height: 40px;

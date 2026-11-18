@@ -50,12 +50,11 @@ function Login() {
         {erro && <S.Erro role="alert">{erro}</S.Erro>}
 
         <S.Campo>
-          <S.Label htmlFor="email">{t("login.email")}</S.Label>
+          <S.Label htmlFor="email">{t("login.email")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></S.Label>
           <S.Input
             id="email"
             name="email"
             type="email"
-            placeholder={t("login.email").toLowerCase()}
             autoComplete="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -64,12 +63,11 @@ function Login() {
         </S.Campo>
 
         <S.Campo>
-          <S.Label htmlFor="senha">{t("login.password")}</S.Label>
+          <S.Label htmlFor="senha">{t("login.password")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></S.Label>
           <S.Input
             id="senha"
             name="senha"
             type={mostrarSenha ? "text" : "password"}
-            placeholder={t("login.password").toLowerCase()}
             autoComplete="current-password"
             value={senha}
             onChange={(event) => setSenha(event.target.value)}
