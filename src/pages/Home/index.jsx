@@ -21,6 +21,13 @@ const EMPTY_FORM = {
   categoria_id: "",
   ativo: true,
 };
+const EMPTY_FIELD_ERRORS = {
+  nome: "",
+  descricao: "",
+  preco: "",
+  quantidade: "",
+  categoria_id: "",
+};
 
 function Home() {
   const { t, language } = useAppSettings();
@@ -35,8 +42,10 @@ function Home() {
   const [categoryName, setCategoryName] = useState("");
   const [categoryError, setCategoryError] = useState("");
   const [savingCategory, setSavingCategory] = useState(false);
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState(EMPTY_FIELD_ERRORS);
   const [formError, setFormError] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -109,12 +118,14 @@ function Home() {
     setIsModalOpen(false);
     setEditingProduct(null);
     setForm(EMPTY_FORM);
+    setFieldErrors(EMPTY_FIELD_ERRORS);
     setFormError("");
   }
 
   function openCreateModal() {
     setEditingProduct(null);
     setForm(EMPTY_FORM);
+    setFieldErrors(EMPTY_FIELD_ERRORS);
     setFormError("");
     setIsModalOpen(true);
   }
@@ -129,30 +140,37 @@ function Home() {
       categoria_id: product.categoria_id == null ? "" : String(product.categoria_id),
       ativo: Boolean(product.ativo),
     });
+    setFieldErrors(EMPTY_FIELD_ERRORS);
     setFormError("");
     setIsModalOpen(true);
   }
 
+  function validateProductForm() {
+    const errors = { ...EMPTY_FIELD_ERRORS };
+    const nome = form.nome.trim();
+    const preco = form.preco === "" ? NaN : Number(form.preco);
+    const quantidade = form.quantidade === "" ? NaN : Number(form.quantidade);
+
+    if (!nome) errors.nome = t("home.nameRequired");
+    if (form.preco === "" || !Number.isFinite(preco) || preco < 0) {
+      errors.preco = t("home.priceInvalid");
+    }
+    if (form.quantidade === "" || !Number.isInteger(quantidade) || quantidade < 0) {
+      errors.quantidade = t("home.quantityInvalid");
+    }
+    setFieldErrors(errors);
+    return Object.values(errors).every((e) => e === "");
+  }
+
   async function saveProduct(event) {
     event.preventDefault();
-    const nome = form.nome.trim();
-    const preco = Number(form.preco);
-    const quantidade = Number(form.quantidade);
-    if (!nome) {
-      setFormError(t("home.nameRequired"));
-      return;
-    }
-    if (form.preco === "" || !Number.isFinite(preco) || preco < 0
-      || form.quantidade === "" || !Number.isInteger(quantidade) || quantidade < 0) {
-      setFormError(t("home.productFieldsRequired"));
-      return;
-    }
+    if (!validateProductForm()) return;
 
     const payload = {
-      nome,
+      nome: form.nome.trim(),
       descricao: form.descricao.trim() || null,
-      preco,
-      quantidade,
+      preco: Number(form.preco),
+      quantidade: Number(form.quantidade),
       categoria_id: form.categoria_id === "" ? null : Number(form.categoria_id),
       ativo: form.ativo,
     };
@@ -185,13 +203,36 @@ function Home() {
     setSavingCategory(true);
     setCategoryError("");
     try {
-      const category = await api.criarCategoria(nome);
-      setCategories((current) => [...current, category].sort((first, second) => first.nome.localeCompare(second.nome)));
+      if (editingCategoryId) {
+        const updated = await api.atualizarCategoria(editingCategoryId, nome);
+        setCategories((current) => current.map((c) => c.id === updated.id ? updated : c).sort((a, b) => a.nome.localeCompare(b.nome)));
+      } else {
+        const category = await api.criarCategoria(nome);
+        setCategories((current) => [...current, category].sort((first, second) => first.nome.localeCompare(second.nome)));
+      }
       setCategoryName("");
+      setEditingCategoryId(null);
     } catch (requestError) {
       setCategoryError(requestError.message || t("home.categorySaveFailed"));
     } finally {
       setSavingCategory(false);
+    }
+  }
+
+  function openEditCategory(category) {
+    setEditingCategoryId(category.id);
+    setCategoryName(category.nome);
+    setCategoryError("");
+    setIsCategoryModalOpen(true);
+  }
+
+  async function deleteCategory(id) {
+    setCategoryError("");
+    try {
+      await api.excluirCategoria(id);
+      setCategories((current) => current.filter((c) => c.id !== id));
+    } catch (requestError) {
+      setCategoryError(requestError.message || t("home.categoryDeleteFailed"));
     }
   }
 
@@ -443,18 +484,22 @@ function Home() {
                 <S.Field>
                   <label htmlFor="product-name">{t("home.name")}</label>
                   <input id="product-name" autoFocus value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} placeholder={t("home.namePlaceholder")} />
+                  {fieldErrors.nome && <S.FieldError>{fieldErrors.nome}</S.FieldError>}
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-description">{t("home.description")}</label>
                   <textarea id="product-description" rows="3" value={form.descricao} onChange={(event) => setForm({ ...form, descricao: event.target.value })} placeholder={t("home.descriptionPlaceholder")} />
+                  {fieldErrors.descricao && <S.FieldError>{fieldErrors.descricao}</S.FieldError>}
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-price">{t("home.price")}</label>
-                  <input id="product-price" type="number" min="0" step="1" value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
+                  <input id="product-price" type="number" min="0" step="0.01" value={form.preco} onChange={(event) => setForm({ ...form, preco: event.target.value })} placeholder="0.00" />
+                  {fieldErrors.preco && <S.FieldError>{fieldErrors.preco}</S.FieldError>}
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-quantity">{t("home.quantity")}</label>
                   <input id="product-quantity" type="number" min="0" step="1" value={form.quantidade} onChange={(event) => setForm({ ...form, quantidade: event.target.value })} placeholder="0" />
+                  {fieldErrors.quantidade && <S.FieldError>{fieldErrors.quantidade}</S.FieldError>}
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-category">{t("home.category")}</label>
@@ -462,6 +507,7 @@ function Home() {
                     <option value="">{t("home.categoryPlaceholder")}</option>
                     {categories.map((category) => <option key={category.id} value={category.id}>{category.nome}</option>)}
                   </select>
+                  {fieldErrors.categoria_id && <S.FieldError>{fieldErrors.categoria_id}</S.FieldError>}
                 </S.Field>
                 <S.ActiveToggle>
                   <S.Checkbox id="product-active" checked={form.ativo} onChange={(event) => setForm({ ...form, ativo: event.target.checked })} />
@@ -498,16 +544,28 @@ function Home() {
               />
               {categoryError && <S.CategoryError role="alert">{categoryError}</S.CategoryError>}
               <S.FormFooter>
-                <S.CancelButton type="button" onClick={() => setIsCategoryModalOpen(false)}>{t("common.cancel")}</S.CancelButton>
+                <S.CancelButton type="button" onClick={() => { setIsCategoryModalOpen(false); setEditingCategoryId(null); setCategoryName(""); }}>{t("common.cancel")}</S.CancelButton>
                 <S.SaveButton type="submit" disabled={savingCategory}>
-                  {savingCategory ? t("home.loading") : t("home.addCategory")}
+                  {savingCategory ? t("home.loading") : editingCategoryId ? t("home.updateCategory") : t("home.addCategory")}
                 </S.SaveButton>
               </S.FormFooter>
             </S.CategoryCreateForm>
             <S.CategoryList aria-label={t("home.manageCategories")}>
               {categories.length === 0
                 ? <S.CategoryEmpty>{t("home.categoriesEmpty")}</S.CategoryEmpty>
-                : categories.map((category) => <li key={category.id}>{category.nome}</li>)}
+                : categories.map((category) => (
+                    <S.CategoryItem key={category.id}>
+                      <span>{category.nome}</span>
+                      <S.CategoryActions>
+                        <S.RowEdit type="button" onClick={() => openEditCategory(category)} aria-label={t("home.editCategory", { name: category.nome })} title={t("home.edit")}>
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" /></svg>
+                        </S.RowEdit>
+                        <S.RowDelete type="button" onClick={() => deleteCategory(category.id)} aria-label={t("home.removeCategory", { name: category.nome })} title={t("home.removeCategory", { name: category.nome })}>
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+                        </S.RowDelete>
+                      </S.CategoryActions>
+                    </S.CategoryItem>
+                  ))}
             </S.CategoryList>
           </S.Dialog>
         </S.Overlay>

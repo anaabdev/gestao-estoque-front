@@ -623,6 +623,32 @@ export const FormError = styled.p`
   line-height: 1.4;
 `;
 
+export const FieldError = styled.p`
+  margin: 2px 0 0 88px;
+  color: var(--accent-text);
+  font-size: 10px;
+  line-height: 1.3;
+  @media (max-width: 620px) { margin-left: 0; }
+`;
+
+export const CategoryItem = styled.li`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  color: var(--txt);
+  font-size: 12px;
+`;
+
+export const CategoryActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+`;
+
 export const FormFooter = styled.div`
   display: flex;
   justify-content: flex-end;

@@ -68,7 +68,13 @@ const messages = {
     "home.quantitySaveFailed": "Could not update the quantity.",
     "home.quantitySaved": "Quantity saved",
     "home.nameRequired": "Enter a product name.",
+    "home.priceInvalid": "Enter a valid price (zero or more).",
+    "home.quantityInvalid": "Enter a whole quantity (zero or more).",
     "home.productFieldsRequired": "Enter a valid price and a whole stock quantity of zero or more.",
+    "home.updateCategory": "Update category",
+    "home.categoryDeleteFailed": "Could not delete the category.",
+    "home.editCategory": "Edit {name}",
+    "home.removeCategory": "Remove {name}",
     "profile.eyebrow": "ACCOUNT SETTINGS",
     "profile.title": "My profile",
     "profile.yourAccount": "Your account",
@@ -180,7 +186,13 @@ const messages = {
     "home.quantitySaveFailed": "Não foi possível atualizar a quantidade.",
     "home.quantitySaved": "Quantidade salva",
     "home.nameRequired": "Informe o nome do produto.",
+    "home.priceInvalid": "Informe um preço válido (zero ou mais).",
+    "home.quantityInvalid": "Informe uma quantidade inteira (zero ou mais).",
     "home.productFieldsRequired": "Informe um preço válido e uma quantidade inteira igual ou maior que zero.",
+    "home.updateCategory": "Atualizar categoria",
+    "home.categoryDeleteFailed": "Não foi possível excluir a categoria.",
+    "home.editCategory": "Editar {name}",
+    "home.removeCategory": "Remover {name}",
     "profile.eyebrow": "CONFIGURAÇÕES DA CONTA",
     "profile.title": "Meu perfil",
     "profile.yourAccount": "Sua conta",
@@ -230,16 +242,32 @@ const messages = {
   },
 };
 
+function detectInitialSettings() {
+  // Language: navigator.language (ex: "pt-BR", "en-US")
+  const navLang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
+  const language = navLang.startsWith("pt") ? "pt" : "en";
+
+  // Theme: prefers-color-scheme media query
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const theme = prefersDark ? "dark" : "light";
+
+  return { language, theme };
+}
+
 function loadSettings() {
   try {
     const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null");
-    return {
-      language: saved?.language === "pt" ? "pt" : "en",
-      theme: saved?.theme === "light" ? "light" : "dark",
-    };
+    if (saved) {
+      return {
+        language: saved.language === "pt" ? "pt" : "en",
+        theme: saved.theme === "light" ? "light" : "dark",
+      };
+    }
   } catch {
-    return { language: "en", theme: "dark" };
+    // Ignore parse errors
   }
+  // First visit: detect from browser/OS
+  return detectInitialSettings();
 }
 
 export function AppSettingsProvider({ children }) {
