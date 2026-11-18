@@ -23,7 +23,8 @@ function ProtectedRoute({ children }) {
   }, []);
 
   if (!authChecked) {
-    return null; // or a loading spinner
+    // retorna uma área vazia enquanto verifica a sessão
+    return null;
   }
 
   if (!isAuthenticated) {

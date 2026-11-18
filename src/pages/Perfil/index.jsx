@@ -17,7 +17,7 @@ function loadProfile() {
     const storedProfile = localStorage.getItem(PROFILE_STORAGE_KEY);
     if (storedProfile) return JSON.parse(storedProfile);
   } catch {
-    // Keep the form usable if browser storage is unavailable.
+    // mantenha o formulário utilizável se o armazenamento do navegador estiver indisponível
   }
   return { fullName: "", birthday: "" };
 }

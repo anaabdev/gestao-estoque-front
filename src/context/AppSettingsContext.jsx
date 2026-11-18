@@ -281,11 +281,11 @@ const messages = {
 };
 
 function detectInitialSettings() {
-  // Language: navigator.language (ex: "pt-BR", "en-US")
+  // idioma: navigator.language (ex.: "pt-br" ou "en-us")
   const navLang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
   const language = navLang.startsWith("pt") ? "pt" : "en";
 
-  // Theme: prefers-color-scheme media query
+  // tema: consulta a preferência de cores do sistema
   const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
   const theme = prefersDark ? "dark" : "light";
 
@@ -302,9 +302,9 @@ function loadSettings() {
       };
     }
   } catch {
-    // Ignore parse errors
+    // ignore erros de leitura e análise das preferências
   }
-  // First visit: detect from browser/OS
+  // primeira visita: detecta as preferências do navegador e do sistema operacional
   return detectInitialSettings();
 }
 
@@ -317,7 +317,7 @@ export function AppSettingsProvider({ children }) {
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch {
-      // Settings still work for the current session if storage is unavailable.
+      // as preferências continuam valendo nesta sessão se o armazenamento estiver indisponível
     }
   }, [settings]);
 
