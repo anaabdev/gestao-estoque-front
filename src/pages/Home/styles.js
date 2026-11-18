@@ -300,7 +300,7 @@ export const Aba = styled.button`
 
 export const Rolagem = styled.div`
   overflow-x: auto;
-  table { width: 100%; min-width: 610px; border-collapse: collapse; }
+  table { width: 100%; min-width: 880px; border-collapse: collapse; }
   th, td { padding: 14px 18px; text-align: center; }
   th { border-bottom: 1px solid var(--border-subtle); color: var(--mut); font-size: 10px; font-weight: 500; }
   td { color: var(--txt); font-size: 12px; }
@@ -313,6 +313,7 @@ export const Rolagem = styled.div`
 export const Linha = styled.tr`
   border-bottom: 1px solid var(--border-subtle);
   background: ${({ $marcada }) => ($marcada ? "var(--surface-selected)" : "transparent")};
+  opacity: ${({ $inativo }) => ($inativo ? .62 : 1)};
   &:hover { background: ${({ $marcada }) => ($marcada ? "var(--surface-selected-hover)" : "var(--row-hover)")}; }
 `;
 
@@ -322,6 +323,15 @@ export const Produto = styled.div`
   gap: 11px;
   color: var(--txt);
   font-weight: 550;
+`;
+
+export const ProductDetails = styled.span`
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  strong { font-weight: 550; }
+  small { max-width: 280px; overflow: hidden; color: var(--mut); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 `;
 
 export const Mini = styled.span`
@@ -372,6 +382,80 @@ export const RowDelete = styled.button`
   &:hover { background: var(--accent-surface); color: var(--accent-text); }
 `;
 
+export const RowActions = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+`;
+
+export const RowEdit = styled(RowDelete)`
+  &:hover { background: var(--surface-raised); color: var(--txt); }
+`;
+
+export const QuantityCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+`;
+
+export const InlineQuantity = styled.input`
+  width: 78px;
+  height: 32px;
+  padding: 0 7px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  background: transparent;
+  color: var(--txt);
+  text-align: center;
+  font: inherit;
+  font-size: 12px;
+  transition: border-color .15s ease, background .15s ease;
+  &:hover { border-color: var(--border-subtle); background: var(--surface-raised); }
+  &:focus { border-color: var(--accent-text); background: var(--surface-field); }
+  &:disabled { opacity: .6; cursor: wait; }
+`;
+
+export const QuantityMessage = styled.span`
+  min-height: 11px;
+  color: var(--mut);
+  font-size: 9px;
+`;
+
+export const StatusPill = styled.span`
+  display: inline-flex;
+  align-items: center;
+  min-height: 23px;
+  padding: 0 9px;
+  border: 1px solid ${({ $active }) => ($active ? "#43836e55" : "var(--border-subtle)")};
+  border-radius: 999px;
+  background: ${({ $active }) => ($active ? "#43836e1b" : "var(--surface-raised)")};
+  color: ${({ $active }) => ($active ? "#82c5aa" : "var(--mut)")};
+  font-size: 10px;
+`;
+
+export const Alert = styled.p`
+  margin: 12px 20px 0;
+  padding: 10px 12px;
+  border: 1px solid #b9444466;
+  border-radius: 9px;
+  background: var(--accent-surface);
+  color: var(--accent-text);
+  font-size: 11px;
+  line-height: 1.45;
+`;
+
+export const Loading = styled.div`
+  flex: 1;
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  color: var(--mut);
+  font-size: 12px;
+`;
+
 export const Vazio = styled.div`
   flex: 1;
   min-height: 220px;
@@ -401,6 +485,8 @@ export const Overlay = styled.div`
 
 export const Dialog = styled.section`
   width: min(680px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
   padding: 32px 36px 36px;
   border: 1px solid var(--border-subtle);
   border-radius: 38px;
@@ -484,15 +570,15 @@ export const FormFields = styled.div`
 
 export const Field = styled.div`
   display: grid;
-  grid-template-columns: 75px minmax(0, 1fr);
+  grid-template-columns: minmax(76px, .32fr) minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   label { color: var(--text-soft); font-size: 12px; }
-  input {
+  input, select, textarea {
     width: 100%;
     min-width: 0;
-    height: 34px;
-    padding: 0 11px;
+    min-height: 36px;
+    padding: 7px 11px;
     border: 1px solid var(--input-border);
     border-radius: 7px;
     outline: none;
@@ -503,8 +589,19 @@ export const Field = styled.div`
     transition: border-color .15s ease, background .15s ease;
     &:focus { border-color: var(--accent-text); background: var(--surface-raised); }
     &::placeholder { color: var(--input-placeholder); }
-    &[type="number"] { max-width: 92px; justify-self: end; }
+    &[type="number"] { max-width: 150px; justify-self: end; }
   }
+  textarea { resize: vertical; font-family: inherit; }
+  select { cursor: pointer; }
+`;
+
+export const ActiveToggle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-left: 88px;
+  label { color: var(--text-soft); font-size: 12px; cursor: pointer; }
+  @media (max-width: 620px) { margin-left: 0; }
 `;
 
 export const FormError = styled.p`
@@ -540,6 +637,7 @@ export const SaveButton = styled.button`
   font-size: 12px;
   font-weight: 650;
   &:hover { background: var(--action-bg); }
+  &:disabled { opacity: .6; cursor: wait; }
 `;
 
 export const srOnly = "";
