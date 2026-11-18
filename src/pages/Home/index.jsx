@@ -38,6 +38,7 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedIds, setSelectedIds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -120,8 +121,20 @@ function Home() {
     if (selectedCategoryId !== null) {
       result = result.filter((product) => Number(product.categoria_id) === selectedCategoryId);
     }
+    const normalizedQuery = searchTerm.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase();
+    if (normalizedQuery) {
+      result = result.filter((product) => {
+        const searchableText = [product.nome, product.descricao, product.categorias?.nome]
+          .filter(Boolean)
+          .join(" ")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLocaleLowerCase();
+        return searchableText.includes(normalizedQuery);
+      });
+    }
     return result;
-  }, [filter, products, selectedCategoryId]);
+  }, [filter, products, searchTerm, selectedCategoryId]);
   const allVisibleSelected = visibleProducts.length > 0
     && visibleProducts.every((product) => selectedIds.includes(product.id));
 
@@ -454,6 +467,22 @@ function Home() {
             </S.AddCategoryFilterButton>
           </S.Abas>
 
+          <S.SearchRow>
+            <S.SearchWrap>
+              <S.SearchIcon viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="10.8" cy="10.8" r="6.3" />
+                <path d="m15.5 15.5 4.2 4.2" />
+              </S.SearchIcon>
+              <S.SearchInput
+                type="search"
+                aria-label={t("home.searchProducts")}
+                placeholder={t("home.searchProducts")}
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </S.SearchWrap>
+          </S.SearchRow>
+
           {error && <S.Alert role="alert">{error}</S.Alert>}
           {loading ? (
             <S.Loading role="status">{t("home.loading")}</S.Loading>
@@ -539,9 +568,9 @@ function Home() {
               {visibleProducts.length === 0 && (
                 <S.Vazio>
                   <span aria-hidden="true">□</span>
-                  <strong>{filter === "low" ? t("home.noLowStock") : selectedCategoryId !== null ? t("home.noCategoryProducts") : t("home.inventoryEmpty")}</strong>
-                  <p>{filter === "low" ? t("home.everythingStocked") : selectedCategoryId !== null ? t("home.noCategoryProducts") : t("home.addFirstProduct")}</p>
-                  {filter === "all" && selectedCategoryId === null && <S.AddButton type="button" onClick={openCreateModal}>+ {t("home.add")}</S.AddButton>}
+                  <strong>{searchTerm.trim() ? t("home.noSearchResults") : filter === "low" ? t("home.noLowStock") : selectedCategoryId !== null ? t("home.noCategoryProducts") : t("home.inventoryEmpty")}</strong>
+                  <p>{searchTerm.trim() ? t("home.tryDifferentSearch") : filter === "low" ? t("home.everythingStocked") : selectedCategoryId !== null ? t("home.noCategoryProducts") : t("home.addFirstProduct")}</p>
+                  {!searchTerm.trim() && filter === "all" && selectedCategoryId === null && <S.AddButton type="button" onClick={openCreateModal}>+ {t("home.add")}</S.AddButton>}
                 </S.Vazio>
               )}
             </>

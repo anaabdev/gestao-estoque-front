@@ -304,6 +304,49 @@ export const Abas = styled.div`
   scrollbar-width: thin;
 `;
 
+export const SearchRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px 0;
+  @media (max-width: 600px) { padding: 10px 14px 0; }
+`;
+
+export const SearchWrap = styled.div`
+  position: relative;
+  width: min(320px, 100%);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--surface-field);
+  &:focus-within { border-color: var(--accent-text); }
+`;
+
+export const SearchIcon = styled.svg`
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--mut);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+`;
+
+export const SearchInput = styled.input`
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px 0 36px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--txt);
+  font: inherit;
+  font-size: 11px;
+  &::placeholder { color: var(--input-placeholder); }
+  &::-webkit-search-cancel-button { cursor: pointer; }
+`;
+
 export const Aba = styled.button`
   display: inline-flex;
   align-items: center;
