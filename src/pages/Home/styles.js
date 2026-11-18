@@ -124,6 +124,21 @@ export const TopActions = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  @media (max-width: 520px) { gap: 7px; }
+`;
+
+export const TopCategoryButton = styled.button`
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 13px;
+  background: var(--surface-main);
+  color: var(--txt);
+  font-size: 12px;
+  font-weight: 650;
+  transition: transform .16s ease, background .16s ease;
+  &:hover { transform: translateY(-1px); background: var(--surface-raised); }
+  @media (max-width: 520px) { min-height: 40px; padding: 0 9px; font-size: 10px; }
 `;
 
 export const Perfil = styled(Link)`
@@ -256,7 +271,21 @@ export const TableHeader = styled.div`
   padding: 0 22px 16px;
   h2 { margin-bottom: 4px; font-size: 16px; }
   p { color: var(--mut); font-size: 11px; }
-  @media (max-width: 600px) { padding: 0 14px 14px; }
+  @media (max-width: 600px) { flex-wrap: wrap; padding: 0 14px 14px; }
+`;
+
+export const TableHeaderActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+  @media (max-width: 600px) {
+    flex: 1 0 100%;
+    justify-content: flex-start;
+  }
 `;
 
 export const BulkActions = styled.div`
@@ -274,14 +303,58 @@ export const DeleteButton = styled.button`
   color: var(--accent-text);
   font-size: 11px;
   &:hover { background: var(--accent-surface); }
+  &:disabled { opacity: .65; cursor: wait; }
 `;
 
 export const Abas = styled.div`
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
   padding: 0 16px 13px;
   border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+`;
+
+export const SearchWrap = styled.div`
+  position: relative;
+  width: min(320px, 100%);
+  flex: 0 1 320px;
+  min-width: min(220px, 100%);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--surface-field);
+  &:focus-within { border-color: var(--accent-text); }
+  @media (max-width: 600px) { flex: 1 1 220px; }
+`;
+
+export const SearchIcon = styled.svg`
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--mut);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+`;
+
+export const SearchInput = styled.input`
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px 0 36px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--txt);
+  font: inherit;
+  font-size: 11px;
+  &::placeholder { color: var(--input-placeholder); }
+  &::-webkit-search-cancel-button { cursor: pointer; }
 `;
 
 export const Aba = styled.button`
@@ -289,6 +362,7 @@ export const Aba = styled.button`
   align-items: center;
   gap: 9px;
   min-height: 34px;
+  flex: none;
   padding: 0 13px;
   border-radius: 9px;
   color: ${({ $ativa }) => ($ativa ? "var(--txt)" : "var(--mut)")};
@@ -298,9 +372,43 @@ export const Aba = styled.button`
   &:hover { background: var(--surface-hover); }
 `;
 
+export const FilterSeparator = styled.span`
+  flex: none;
+  padding: 0 3px;
+  color: var(--mut);
+  font-size: 13px;
+`;
+
+export const CategoryFilterButton = styled.button`
+  min-height: 34px;
+  flex: none;
+  padding: 0 12px;
+  border-radius: 9px;
+  background: ${({ $ativa }) => ($ativa ? "var(--surface-raised)" : "transparent")};
+  color: ${({ $ativa }) => ($ativa ? "var(--txt)" : "var(--mut)")};
+  font-size: 11px;
+  &:hover { background: var(--surface-hover); color: var(--txt); }
+`;
+
+export const AddCategoryFilterButton = styled.button`
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  margin-left: 2px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  color: var(--text-soft);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+  &:hover { border-color: var(--accent-text); color: var(--txt); }
+`;
+
 export const Rolagem = styled.div`
   overflow-x: auto;
-  table { width: 100%; min-width: 610px; border-collapse: collapse; }
+  table { width: 100%; min-width: 880px; border-collapse: collapse; }
   th, td { padding: 14px 18px; text-align: center; }
   th { border-bottom: 1px solid var(--border-subtle); color: var(--mut); font-size: 10px; font-weight: 500; }
   td { color: var(--txt); font-size: 12px; }
@@ -313,6 +421,7 @@ export const Rolagem = styled.div`
 export const Linha = styled.tr`
   border-bottom: 1px solid var(--border-subtle);
   background: ${({ $marcada }) => ($marcada ? "var(--surface-selected)" : "transparent")};
+  opacity: ${({ $inativo }) => ($inativo ? .62 : 1)};
   &:hover { background: ${({ $marcada }) => ($marcada ? "var(--surface-selected-hover)" : "var(--row-hover)")}; }
 `;
 
@@ -322,6 +431,15 @@ export const Produto = styled.div`
   gap: 11px;
   color: var(--txt);
   font-weight: 550;
+`;
+
+export const ProductDetails = styled.span`
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  strong { font-weight: 550; }
+  small { max-width: 280px; overflow: hidden; color: var(--mut); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 `;
 
 export const Mini = styled.span`
@@ -370,6 +488,98 @@ export const RowDelete = styled.button`
   color: var(--mut);
   svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   &:hover { background: var(--accent-surface); color: var(--accent-text); }
+  &:disabled { opacity: .65; cursor: wait; }
+`;
+
+export const LoadingSpinner = styled.span`
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  flex: none;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: loading-spin .7s linear infinite;
+  @keyframes loading-spin { to { transform: rotate(360deg); } }
+`;
+
+export const RowActions = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+`;
+
+export const RowEdit = styled(RowDelete)`
+  &:hover { background: var(--surface-raised); color: var(--txt); }
+`;
+
+export const QuantityCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+`;
+
+export const InlineQuantity = styled.input`
+  width: 78px;
+  height: 32px;
+  padding: 0 7px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  outline: none;
+  background: var(--surface-field);
+  color: var(--txt);
+  text-align: center;
+  font: inherit;
+  font-size: 12px;
+  transition: border-color .15s ease, background .15s ease;
+  &:hover { border-color: var(--border-strong); background: var(--surface-raised); }
+  &:focus { border-color: var(--accent-text); background: var(--surface-field); }
+  &:disabled { opacity: .6; cursor: wait; }
+`;
+
+export const QuantityMessage = styled.span`
+  min-height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--mut);
+  font-size: 9px;
+  white-space: nowrap;
+`;
+
+export const StatusPill = styled.span`
+  display: inline-flex;
+  align-items: center;
+  min-height: 23px;
+  padding: 0 9px;
+  border: 1px solid ${({ $active }) => ($active ? "#43836e55" : "var(--border-subtle)")};
+  border-radius: 999px;
+  background: ${({ $active }) => ($active ? "#43836e1b" : "var(--surface-raised)")};
+  color: ${({ $active }) => ($active ? "#82c5aa" : "var(--mut)")};
+  font-size: 10px;
+`;
+
+export const Alert = styled.p`
+  margin: 12px 20px 0;
+  padding: 10px 12px;
+  border: 1px solid #b9444466;
+  border-radius: 9px;
+  background: var(--accent-surface);
+  color: var(--accent-text);
+  font-size: 11px;
+  line-height: 1.45;
+`;
+
+export const Loading = styled.div`
+  flex: 1;
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  color: var(--mut);
+  font-size: 12px;
 `;
 
 export const Vazio = styled.div`
@@ -401,12 +611,34 @@ export const Overlay = styled.div`
 
 export const Dialog = styled.section`
   width: min(680px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
   padding: 32px 36px 36px;
   border: 1px solid var(--border-subtle);
   border-radius: 38px;
   background: var(--surface-dialog);
   box-shadow: 0 24px 100px #000b;
   @media (max-width: 620px) { padding: 25px 20px 22px; border-radius: 28px; }
+`;
+
+export const ConfirmDialog = styled(Dialog)`
+  width: min(460px, 100%);
+  padding: 28px;
+  @media (max-width: 620px) { padding: 22px 18px; }
+`;
+
+export const ConfirmMessage = styled.p`
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+`;
+
+export const ConfirmWarning = styled.p`
+  margin-top: 8px;
+  color: var(--accent-text);
+  font-size: 12px;
+  line-height: 1.45;
 `;
 
 export const ModalTop = styled.div`
@@ -484,15 +716,15 @@ export const FormFields = styled.div`
 
 export const Field = styled.div`
   display: grid;
-  grid-template-columns: 75px minmax(0, 1fr);
+  grid-template-columns: 96px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   label { color: var(--text-soft); font-size: 12px; }
-  input {
+  input, select, textarea {
     width: 100%;
     min-width: 0;
-    height: 34px;
-    padding: 0 11px;
+    min-height: 36px;
+    padding: 7px 11px;
     border: 1px solid var(--input-border);
     border-radius: 7px;
     outline: none;
@@ -503,15 +735,74 @@ export const Field = styled.div`
     transition: border-color .15s ease, background .15s ease;
     &:focus { border-color: var(--accent-text); background: var(--surface-raised); }
     &::placeholder { color: var(--input-placeholder); }
-    &[type="number"] { max-width: 92px; justify-self: end; }
+    &[type="number"] { max-width: 150px; justify-self: end; }
   }
+  textarea {
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
+    overflow-y: auto;
+    resize: none;
+    font-family: inherit;
+  }
+  select { cursor: pointer; }
+`;
+
+export const ActiveToggle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-left: 108px;
+  label { color: var(--text-soft); font-size: 12px; cursor: pointer; }
 `;
 
 export const FormError = styled.p`
-  margin: -3px 0 0 87px;
+  margin: -3px 0 0 108px;
   color: var(--accent-text);
   font-size: 11px;
   line-height: 1.4;
+`;
+
+export const FieldError = styled.p`
+  grid-column: 2;
+  min-width: 0;
+  margin: 2px 0 0;
+  color: var(--accent-text);
+  font-size: 10px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+`;
+
+export const FieldHint = styled.p`
+  grid-column: 2;
+  justify-self: end;
+  color: var(--mut);
+  font-size: 9px;
+  line-height: 1.2;
+`;
+
+export const RequiredMark = styled.span`
+  margin-left: 3px;
+  color: var(--accent-text);
+  font-weight: 700;
+`;
+
+export const CategoryItem = styled.li`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  color: var(--txt);
+  font-size: 12px;
+`;
+
+export const CategoryActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
 `;
 
 export const FormFooter = styled.div`
@@ -519,6 +810,57 @@ export const FormFooter = styled.div`
   justify-content: flex-end;
   gap: 9px;
   margin-top: 8px;
+`;
+
+export const CategoryCreateForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  label { color: var(--text-soft); font-size: 12px; }
+`;
+
+export const CategoryInput = styled.input`
+  width: 100%;
+  min-height: 40px;
+  padding: 0 11px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  outline: none;
+  background: var(--surface-field);
+  color: var(--txt);
+  font: inherit;
+  font-size: 12px;
+  &:focus { border-color: var(--accent-text); background: var(--surface-raised); }
+  &::placeholder { color: var(--input-placeholder); }
+`;
+
+export const CategoryError = styled.p`
+  color: var(--accent-text);
+  font-size: 11px;
+  line-height: 1.4;
+`;
+
+export const CategoryList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  li {
+    padding: 10px 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 9px;
+    color: var(--txt);
+    font-size: 12px;
+  }
+`;
+
+export const CategoryEmpty = styled.li`
+  color: var(--mut) !important;
+  text-align: center;
 `;
 
 export const CancelButton = styled.button`
@@ -540,6 +882,7 @@ export const SaveButton = styled.button`
   font-size: 12px;
   font-weight: 650;
   &:hover { background: var(--action-bg); }
+  &:disabled { opacity: .6; cursor: wait; }
 `;
 
 export const srOnly = "";
