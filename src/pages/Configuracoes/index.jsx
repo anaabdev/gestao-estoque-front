@@ -12,7 +12,7 @@ import * as S from "./styles";
 
 function Configuracoes() {
   const { language, setLanguage, theme, setTheme, resetSettings, t } = useAppSettings();
-  const [resetMessage, setResetMessage] = useState("");
+  const [resetMessage, setResetMessage] = useState(false);
 
   function restoreDefaults() {
     resetSettings();
@@ -91,12 +91,12 @@ function Configuracoes() {
             </S.CardHeading>
 
             <S.LanguageChoices role="group" aria-label={t("settings.language")}>
-              <S.LanguageOption type="button" $active={language === "pt"} aria-pressed={language === "pt"} onClick={() => { setLanguage("pt"); setResetMessage(""); }}>
+              <S.LanguageOption type="button" $active={language === "pt"} aria-pressed={language === "pt"} onClick={() => { setLanguage("pt"); setResetMessage(false); }}>
                 <S.Flag aria-hidden="true">BR</S.Flag>
                 <span>{t("settings.portuguese")}</span>
                 {language === "pt" && <S.SelectedMark aria-hidden="true">✓</S.SelectedMark>}
               </S.LanguageOption>
-              <S.LanguageOption type="button" $active={language === "en"} aria-pressed={language === "en"} onClick={() => { setLanguage("en"); setResetMessage(""); }}>
+              <S.LanguageOption type="button" $active={language === "en"} aria-pressed={language === "en"} onClick={() => { setLanguage("en"); setResetMessage(false); }}>
                 <S.Flag $english aria-hidden="true">EN</S.Flag>
                 <span>{t("settings.english")}</span>
                 {language === "en" && <S.SelectedMark aria-hidden="true">✓</S.SelectedMark>}
@@ -107,9 +107,9 @@ function Configuracoes() {
           <S.SettingsFooter>
             <div>
               <p>{t("settings.appliedImmediately")}</p>
-              <small>{resetMessage ? t("settings.resetDone") : t("settings.resetHelp")}</small>
+              <S.ResetTextButton type="button" onClick={restoreDefaults}>{t("settings.resetHelp")}</S.ResetTextButton>
+              {resetMessage && <S.ResetConfirmation role="status">{t("settings.resetDone")}</S.ResetConfirmation>}
             </div>
-            <S.ResetButton type="button" onClick={restoreDefaults}>{t("settings.reset")}</S.ResetButton>
           </S.SettingsFooter>
         </S.SettingsGrid>
       </H.Painel>

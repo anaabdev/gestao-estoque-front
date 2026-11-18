@@ -13,6 +13,7 @@ import { api } from "../../services/api.js";
 import * as S from "./styles";
 
 const LOW_STOCK_LIMIT = 20;
+const DESCRIPTION_MAX_LENGTH = 255;
 const EMPTY_FORM = {
   nome: "",
   descricao: "",
@@ -484,11 +485,12 @@ function Home() {
                 <S.Field>
                   <label htmlFor="product-name">{t("home.name")}</label>
                   <input id="product-name" autoFocus value={form.nome} onChange={(event) => setForm({ ...form, nome: event.target.value })} placeholder={t("home.namePlaceholder")} />
-                  {fieldErrors.nome && <S.FieldError>{fieldErrors.nome}</S.FieldError>}
+                  {fieldErrors.nome && <S.FieldError id="product-name-error">{fieldErrors.nome}</S.FieldError>}
                 </S.Field>
                 <S.Field>
                   <label htmlFor="product-description">{t("home.description")}</label>
-                  <textarea id="product-description" rows="3" value={form.descricao} onChange={(event) => setForm({ ...form, descricao: event.target.value })} placeholder={t("home.descriptionPlaceholder")} />
+                  <textarea id="product-description" rows="3" maxLength={DESCRIPTION_MAX_LENGTH} value={form.descricao} onChange={(event) => setForm({ ...form, descricao: event.target.value })} placeholder={t("home.descriptionPlaceholder")} />
+                  <S.FieldHint>{t("home.descriptionLimit", { count: form.descricao.length, max: DESCRIPTION_MAX_LENGTH })}</S.FieldHint>
                   {fieldErrors.descricao && <S.FieldError>{fieldErrors.descricao}</S.FieldError>}
                 </S.Field>
                 <S.Field>

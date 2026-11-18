@@ -155,21 +155,26 @@ export const SettingsFooter = styled.footer`
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 18px;
   padding: 15px 4px 0;
   p { color: var(--mut); font-size: 11px; }
-  small { display: block; min-height: 15px; margin-top: 5px; color: var(--accent-text); font-size: 10px; }
+  > div { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
   @media (max-width: 600px) { align-items: flex-start; flex-direction: column; }
 `;
 
-export const ResetButton = styled.button`
-  min-height: 38px;
-  flex: none;
-  padding: 0 13px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+export const ResetTextButton = styled.button`
+  padding: 0;
+  color: var(--accent-text);
+  font-size: 10px;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  &:hover { color: var(--txt); }
+  &:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+`;
+
+export const ResetConfirmation = styled.small`
   color: var(--mut);
   font-size: 10px;
-  &:hover { border-color: var(--accent-text); color: var(--txt); }
 `;

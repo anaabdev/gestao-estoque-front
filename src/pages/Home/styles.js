@@ -582,7 +582,7 @@ export const FormFields = styled.div`
 
 export const Field = styled.div`
   display: grid;
-  grid-template-columns: minmax(76px, .32fr) minmax(0, 1fr);
+  grid-template-columns: 96px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   label { color: var(--text-soft); font-size: 12px; }
@@ -611,24 +611,33 @@ export const ActiveToggle = styled.div`
   display: flex;
   align-items: center;
   gap: 9px;
-  margin-left: 88px;
+  margin-left: 108px;
   label { color: var(--text-soft); font-size: 12px; cursor: pointer; }
-  @media (max-width: 620px) { margin-left: 0; }
 `;
 
 export const FormError = styled.p`
-  margin: -3px 0 0 87px;
+  margin: -3px 0 0 108px;
   color: var(--accent-text);
   font-size: 11px;
   line-height: 1.4;
 `;
 
 export const FieldError = styled.p`
-  margin: 2px 0 0 88px;
+  grid-column: 2;
+  min-width: 0;
+  margin: 2px 0 0;
   color: var(--accent-text);
   font-size: 10px;
   line-height: 1.3;
-  @media (max-width: 620px) { margin-left: 0; }
+  overflow-wrap: anywhere;
+`;
+
+export const FieldHint = styled.p`
+  grid-column: 2;
+  justify-self: end;
+  color: var(--mut);
+  font-size: 9px;
+  line-height: 1.2;
 `;
 
 export const CategoryItem = styled.li`
