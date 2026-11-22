@@ -101,9 +101,6 @@ function Login() {
         </S.Botao>
       </S.Card>
 
-      <S.Footer>
-        <p>{t("login.footer")}</p>
-      </S.Footer>
     </S.Pagina>
   );
 }

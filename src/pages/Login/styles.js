@@ -5,7 +5,7 @@ export const Pagina = styled.div`
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 16px 16px 60px;
+  padding: 16px;
   background: var(--login-page);
 `;
 
@@ -105,6 +105,7 @@ export const Esqueci = styled.a`
 export const Botao = styled.button`
   width: 100%;
   height: 40px;
+  margin-top: 16px;
   border-radius: 10px;
   background: var(--vinho);
   font-weight: 600;
@@ -121,21 +122,6 @@ export const Criar = styled.a`
   font-weight: 600;
 
   &:hover { text-decoration: underline; }
-`;
-
-export const Footer = styled.footer`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 44px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--border-subtle);
-  backdrop-filter: blur(6px);
-
-  p { font-size: 13px; color: var(--mut); }
 `;
 
 export const Loading = styled.div`

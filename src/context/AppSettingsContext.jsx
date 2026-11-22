@@ -139,7 +139,6 @@ const messages = {
     "login.forgot": "Forgot password?",
     "login.getStarted": "Get Started",
     "login.createAccount": "Create an account",
-    "login.footer": "All rights reserved 2026",
   },
   pt: {
     "brand.logo": "Logo do site",
@@ -276,7 +275,6 @@ const messages = {
     "login.forgot": "Esqueceu a senha?",
     "login.getStarted": "Entrar",
     "login.createAccount": "Criar uma conta",
-    "login.footer": "Todos os direitos reservados 2026",
   },
 };
 
