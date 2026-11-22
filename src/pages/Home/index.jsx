@@ -6,7 +6,8 @@ import perfilSide from "../../assets/PerfilSideBar_Home.svg";
 import settings from "../../assets/Settings_Home.svg";
 import saida from "../../assets/Saida_Home.svg";
 import perfilTop from "../../assets/PerfilTop_Home.svg";
-import mascote from "../../assets/Mascote_Home.svg";
+import mascoteClaro from "../../assets/MascoteClaro_Home.svg";
+import mascoteEscuro from "../../assets/MascoteEscuro_Home.svg";
 import logo from "../../assets/Logo_Site.svg";
 import { useAppSettings } from "../../context/useAppSettings.js";
 import { api } from "../../services/api.js";
@@ -31,7 +32,8 @@ const EMPTY_FIELD_ERRORS = {
 };
 
 function Home() {
-  const { t, language } = useAppSettings();
+  const { t, language, theme } = useAppSettings();
+  const mascote = theme === "light" ? mascoteClaro : mascoteEscuro;
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
