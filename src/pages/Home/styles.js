@@ -671,39 +671,113 @@ export const ProductForm = styled.form`
   @media (max-width: 620px) { grid-template-columns: 1fr; gap: 18px; }
 `;
 
+export const ImageColumn = styled.div`
+  min-width: 0;
+`;
+
 export const ProductPreview = styled.div`
-  min-height: 186px;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
   display: grid;
   place-items: center;
   border-radius: 12px;
   background: var(--surface-raised);
-  @media (max-width: 620px) { min-height: 94px; }
+  @media (max-width: 620px) { max-width: 240px; margin: 0 auto; }
 `;
 
-export const BoxIcon = styled.div`
-  position: relative;
-  width: 120px;
-  height: 61px;
-  margin-top: 20px;
-  background: #d6d6d6;
-  &::before {
-    content: "";
-    position: absolute;
-    top: -13px;
-    right: 9px;
-    width: 28px;
-    height: 13px;
-    background: #d6d6d6;
-  }
-  span {
-    position: absolute;
-    top: -1px;
-    left: 50%;
-    width: 1px;
-    height: 100%;
-    background: #c3c3c3;
-  }
-  @media (max-width: 620px) { transform: scale(.75); margin: 0; }
+export const ProductImage = styled.img`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const ImageFileInput = styled.input`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  &:focus-visible + label { outline: 2px solid var(--accent-text); outline-offset: -3px; }
+`;
+
+export const ImageUploadLabel = styled.label`
+  position: absolute;
+  inset: ${({ $hasImage }) => ($hasImage ? "auto 8px 8px" : "0")};
+  min-height: ${({ $hasImage }) => ($hasImage ? "36px" : "100%")};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: ${({ $hasImage }) => ($hasImage ? "0" : "1px dashed var(--input-border)")};
+  border-radius: ${({ $hasImage }) => ($hasImage ? "8px" : "12px")};
+  background: ${({ $hasImage }) => ($hasImage ? "rgba(0, 0, 0, .68)" : "transparent")};
+  color: ${({ $hasImage }) => ($hasImage ? "#fff" : "var(--text-soft)")};
+  cursor: pointer;
+  font-size: 12px;
+  transition: background .15s ease, color .15s ease;
+  svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  &:hover { background: ${({ $hasImage }) => ($hasImage ? "rgba(0, 0, 0, .82)" : "var(--surface-hover, rgba(255,255,255,.04))")}; }
+  ${({ $hasImage }) => !$hasImage && `flex-direction: column; svg { width: 42px; height: 42px; }`}
+`;
+
+export const ImageClearButton = styled.button`
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  right: 8px;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .72);
+  color: #fff;
+  font-size: 21px;
+  line-height: 1;
+  &:hover { background: rgba(0, 0, 0, .9); }
+`;
+
+export const ImageSquareHint = styled.p`
+  margin: 7px 0 0;
+  color: var(--mut);
+  font-size: 10px;
+  line-height: 1.4;
+`;
+
+export const ImageOptions = styled.div`
+  margin-top: 13px;
+  p { margin-bottom: 8px; color: var(--text-soft); font-size: 11px; line-height: 1.35; }
+  > div { display: grid; gap: 7px; }
+`;
+
+export const ImageOptionButton = styled.button`
+  min-height: 34px;
+  padding: 7px 9px;
+  border: 1px solid ${({ $primary }) => ($primary ? "var(--accent-text)" : "var(--input-border)")};
+  border-radius: 7px;
+  background: ${({ $primary }) => ($primary ? "var(--accent-text)" : "var(--surface-field)")};
+  color: ${({ $primary }) => ($primary ? "var(--accent-contrast, #fff)" : "var(--txt)")};
+  font-size: 11px;
+  line-height: 1.25;
+  &:hover:not(:disabled) { filter: brightness(1.08); }
+  &:disabled { cursor: wait; opacity: .65; }
+`;
+
+export const ImageError = styled.p`
+  margin-top: 8px;
+  color: var(--accent-text);
+  font-size: 10px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 `;
 
 export const FormFields = styled.div`

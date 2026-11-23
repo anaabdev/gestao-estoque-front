@@ -15,14 +15,44 @@ import * as S from "./styles";
 
 const LOW_STOCK_LIMIT = 20;
 const DESCRIPTION_MAX_LENGTH = 255;
+const MAX_IMAGE_FILE_SIZE = 20 * 1024 * 1024;
+const MAX_IMAGE_DATA_URL_LENGTH = 1_450_000;
 const EMPTY_FORM = {
   nome: "",
   descricao: "",
+  imagem_url: null,
   preco: "",
   quantidade: "0",
   categoria_id: "",
   ativo: true,
 };
+
+async function criarImagemQuadrada(file, { manterTransparencia = false, mensagemDeErro } = {}) {
+  const image = await createImageBitmap(file);
+  try {
+    const sourceSize = Math.min(image.width, image.height);
+    const sourceX = (image.width - sourceSize) / 2;
+    const sourceY = (image.height - sourceSize) / 2;
+
+    for (let size = 512; size >= 128; size = Math.floor(size * 0.75)) {
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error(mensagemDeErro);
+      context.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
+
+      const dataUrl = manterTransparencia
+        ? canvas.toDataURL("image/png")
+        : canvas.toDataURL("image/webp", 0.82);
+      if (dataUrl.length <= MAX_IMAGE_DATA_URL_LENGTH) return dataUrl;
+    }
+    throw new Error(mensagemDeErro);
+  } finally {
+    image.close();
+  }
+}
+
 const EMPTY_FIELD_ERRORS = {
   nome: "",
   descricao: "",
@@ -52,6 +82,10 @@ function Home() {
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [processingImage, setProcessingImage] = useState(false);
+  const [imageError, setImageError] = useState("");
   const [fieldErrors, setFieldErrors] = useState(EMPTY_FIELD_ERRORS);
   const [formError, setFormError] = useState("");
   const [error, setError] = useState("");
@@ -141,16 +175,26 @@ function Home() {
     && visibleProducts.every((product) => selectedIds.includes(product.id));
 
   function closeModal() {
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
     setIsModalOpen(false);
     setEditingProduct(null);
     setForm(EMPTY_FORM);
+    setSelectedImageFile(null);
+    setImagePreviewUrl("");
+    setProcessingImage(false);
+    setImageError("");
     setFieldErrors(EMPTY_FIELD_ERRORS);
     setFormError("");
   }
 
   function openCreateModal() {
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
     setEditingProduct(null);
     setForm(EMPTY_FORM);
+    setSelectedImageFile(null);
+    setImagePreviewUrl("");
+    setProcessingImage(false);
+    setImageError("");
     setFieldErrors(EMPTY_FIELD_ERRORS);
     setFormError("");
     setIsModalOpen(true);
@@ -161,14 +205,77 @@ function Home() {
     setForm({
       nome: product.nome ?? "",
       descricao: (product.descricao ?? "").slice(0, DESCRIPTION_MAX_LENGTH),
+      imagem_url: product.imagem_url ?? null,
       preco: String(product.preco ?? ""),
       quantidade: String(product.quantidade ?? 0),
       categoria_id: product.categoria_id == null ? "" : String(product.categoria_id),
       ativo: Boolean(product.ativo),
     });
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    setSelectedImageFile(null);
+    setImagePreviewUrl("");
+    setProcessingImage(false);
+    setImageError("");
     setFieldErrors(EMPTY_FIELD_ERRORS);
     setFormError("");
     setIsModalOpen(true);
+  }
+
+  function selectProductImage(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setImageError(t("home.imageTypeInvalid"));
+      return;
+    }
+    if (file.size > MAX_IMAGE_FILE_SIZE) {
+      setImageError(t("home.imageTooLarge"));
+      return;
+    }
+
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    setSelectedImageFile(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+    setImageError("");
+  }
+
+  function cancelImageSelection() {
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    setSelectedImageFile(null);
+    setImagePreviewUrl("");
+    setImageError("");
+  }
+
+  function clearProductImage() {
+    if (selectedImageFile) {
+      cancelImageSelection();
+      return;
+    }
+    cancelImageSelection();
+    setForm((current) => ({ ...current, imagem_url: null }));
+  }
+
+  async function chooseImageBackground(keepBackground) {
+    if (!selectedImageFile || processingImage) return;
+    setProcessingImage(true);
+    setImageError("");
+    try {
+      const imageFile = keepBackground
+        ? selectedImageFile
+        : await api.removerFundoImagem(selectedImageFile);
+      const imagem_url = await criarImagemQuadrada(imageFile, {
+        manterTransparencia: !keepBackground,
+        mensagemDeErro: t("home.imageProcessFailed"),
+      });
+      setForm((current) => ({ ...current, imagem_url }));
+      cancelImageSelection();
+    } catch (requestError) {
+      setImageError(requestError.message || t("home.imageProcessFailed"));
+    } finally {
+      setProcessingImage(false);
+    }
   }
 
   function validateProductForm() {
@@ -193,11 +300,13 @@ function Home() {
 
   async function saveProduct(event) {
     event.preventDefault();
+    if (selectedImageFile || processingImage) return;
     if (!validateProductForm()) return;
 
     const payload = {
       nome: form.nome.trim(),
       descricao: form.descricao.slice(0, DESCRIPTION_MAX_LENGTH).trim() || null,
+      imagem_url: form.imagem_url,
       preco: Number(form.preco),
       quantidade: Number(form.quantidade),
       categoria_id: form.categoria_id === "" ? null : Number(form.categoria_id),
@@ -587,9 +696,47 @@ function Home() {
               <S.CloseButton type="button" onClick={closeModal} aria-label={t("common.close")}>×</S.CloseButton>
             </S.ModalTop>
             <S.ProductForm noValidate onSubmit={saveProduct}>
-              <S.ProductPreview aria-hidden="true">
-                <S.BoxIcon><span /></S.BoxIcon>
-              </S.ProductPreview>
+              <S.ImageColumn>
+                <S.ProductPreview>
+                  {(imagePreviewUrl || form.imagem_url) && (
+                    <S.ProductImage src={imagePreviewUrl || form.imagem_url} alt="" aria-hidden="true" />
+                  )}
+                  <S.ImageFileInput
+                    id="product-image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    aria-label={t("home.addImage")}
+                    onChange={selectProductImage}
+                  />
+                  <S.ImageUploadLabel htmlFor="product-image" $hasImage={Boolean(imagePreviewUrl || form.imagem_url)}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M4 7.5h3l1.4-2h7.2l1.4 2h3v11H4z" />
+                      <circle cx="12" cy="13" r="3.3" />
+                    </svg>
+                    <span>{imagePreviewUrl || form.imagem_url ? t("home.changeImage") : t("home.addImage")}</span>
+                  </S.ImageUploadLabel>
+                  {(imagePreviewUrl || form.imagem_url) && (
+                    <S.ImageClearButton type="button" disabled={processingImage} onClick={clearProductImage} aria-label={selectedImageFile ? t("home.cancelImageSelection") : t("home.removeImage")}>
+                      ×
+                    </S.ImageClearButton>
+                  )}
+                </S.ProductPreview>
+                <S.ImageSquareHint>{t("home.imageSquareHint")}</S.ImageSquareHint>
+                {selectedImageFile && (
+                  <S.ImageOptions>
+                    <p>{t("home.imageBackgroundChoice")}</p>
+                    <div>
+                      <S.ImageOptionButton type="button" disabled={processingImage} onClick={() => chooseImageBackground(true)}>
+                        {processingImage ? t("home.processingImage") : t("home.keepBackground")}
+                      </S.ImageOptionButton>
+                      <S.ImageOptionButton type="button" $primary disabled={processingImage} onClick={() => chooseImageBackground(false)}>
+                        {processingImage ? t("home.processingImage") : t("home.removeBackground")}
+                      </S.ImageOptionButton>
+                    </div>
+                  </S.ImageOptions>
+                )}
+                {imageError && <S.ImageError role="alert">{imageError}</S.ImageError>}
+              </S.ImageColumn>
               <S.FormFields>
                 <S.Field>
                   <label htmlFor="product-name">{t("home.name")}<S.RequiredMark aria-hidden="true">*</S.RequiredMark></label>
@@ -627,7 +774,7 @@ function Home() {
                 {formError && <S.FormError role="alert">{formError}</S.FormError>}
                 <S.FormFooter>
                   <S.CancelButton type="button" onClick={closeModal}>{t("common.cancel")}</S.CancelButton>
-                  <S.SaveButton type="submit" disabled={saving}>
+                  <S.SaveButton type="submit" disabled={saving || processingImage || Boolean(selectedImageFile)}>
                     {saving ? t("home.loading") : editingProduct ? t("home.updateProduct") : t("home.saveProduct")}
                   </S.SaveButton>
                 </S.FormFooter>

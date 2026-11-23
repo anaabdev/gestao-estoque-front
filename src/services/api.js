@@ -12,6 +12,22 @@ async function request(path, options = {}) {
   return data;
 }
 
+async function upload(path, file) {
+  const formData = new FormData();
+  formData.append('imagem', file, file.name || 'imagem-produto');
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.erro || data?.error || 'Erro na requisição');
+  }
+  return res.blob();
+}
+
 export const api = {
   login: (email, senha) =>
     request('/login', { method: 'POST', body: JSON.stringify({ email, senha }) }),
@@ -36,6 +52,8 @@ export const api = {
 
   criarProduto: (dados) =>
     request('/produtos', { method: 'POST', body: JSON.stringify(dados) }),
+
+  removerFundoImagem: (imagem) => upload('/produtos/remover-fundo', imagem),
 
   atualizarProduto: (id, dados) =>
     request(`/produtos/${id}`, { method: 'PUT', body: JSON.stringify(dados) }),
