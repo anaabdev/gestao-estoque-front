@@ -626,7 +626,11 @@ function Home() {
                           </td>
                           <td>
                             <S.Produto>
-                              <S.Mini aria-hidden="true">{productName.trim().charAt(0).toUpperCase()}</S.Mini>
+                              <S.Mini aria-hidden="true">
+                                {product.imagem_url
+                                  ? <S.MiniImage src={product.imagem_url} alt="" />
+                                  : productName.trim().charAt(0).toUpperCase()}
+                              </S.Mini>
                               <S.ProductDetails>
                                 <strong>{productName}</strong>
                                 {product.descricao && <small>{product.descricao}</small>}

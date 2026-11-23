@@ -443,6 +443,8 @@ export const ProductDetails = styled.span`
 `;
 
 export const Mini = styled.span`
+  position: relative;
+  overflow: hidden;
   width: 34px;
   height: 34px;
   flex: none;
@@ -453,6 +455,13 @@ export const Mini = styled.span`
   color: var(--text-soft);
   font-size: 12px;
   font-weight: 650;
+`;
+
+export const MiniImage = styled.img`
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 export const StockValue = styled.span`
